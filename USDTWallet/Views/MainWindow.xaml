@@ -1,0 +1,58 @@
+﻿<Window x:Class="USDTWallet.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:prism="http://prismlibrary.com/"
+        xmlns:local="clr-namespace:USDTWallet.Views"
+        prism:ViewModelLocator.AutoWireViewModel="True"
+        mc:Ignorable="d"
+        Title="USDT Wallet" Height="620" Width="1236" MinWidth="940" WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="MainWindowStyle.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+
+        <Menu Grid.Row="0" IsMainMenu="True">
+            <MenuItem Header="账户">
+                <MenuItem Header="新建账户" InputGestureText="Ctrl + N" />
+                <MenuItem Header="导入账户" InputGestureText="Ctrl + I" />
+                <MenuItem Header="打开日志"  />
+                <Separator/>
+                <MenuItem Header="备份" />
+            </MenuItem>
+
+            <MenuItem Header="网络">
+                <MenuItem Header="切换网络" InputGestureText="Ctrl + N" />
+            </MenuItem>
+
+            <MenuItem Header="语言">
+                <MenuItem Header="中文" IsCheckable="True" IsChecked="True" />
+                <MenuItem Header="英文" IsCheckable="True" />
+            </MenuItem>
+
+            <MenuItem Header="帮助">
+                <MenuItem Header="关于USDT Wallet"/>
+            </MenuItem>
+        </Menu>
+
+        <StackPanel Grid.Row="1" HorizontalAlignment="Right" Background="#00D55F" Panel.ZIndex="1000" Height="30" Margin="0 0 20 -60" >
+            <ContentControl Foreground="#FFF" FontSize="14" VerticalAlignment="Center">
+                <TextBlock Text="{Binding Network}" Padding="10 5 10 0" VerticalAlignment="Center" />
+            </ContentControl>
+        </StackPanel>
+
+        <TabControl Grid.Row="2" BorderThickness="0 0 0 0" Margin="0 0 0 0" prism:RegionManager.RegionName="MainContentRegion" prism:RegionManager.RegionContext="">
+        </TabControl>
+
+    </Grid>
+</Window>

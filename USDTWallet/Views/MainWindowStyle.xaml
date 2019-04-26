@@ -1,0 +1,191 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:USDTWallet.Views">
+   
+    <Style TargetType="{x:Type TabControl}">
+        <Setter Property="TabStripPlacement" Value="Top" />
+        <Setter Property="Margin" Value="2" />
+        <Setter Property="Padding" Value="2"    />
+        <Setter Property="Background" Value="#F5F5F5" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type TabControl}">
+                    <Grid ClipToBounds="True" SnapsToDevicePixels="True" KeyboardNavigation.TabNavigation="Local">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Name="ColumnDefinition0" />
+                            <ColumnDefinition Width="0" Name="ColumnDefinition1" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" Name="RowDefinition0" />
+                            <RowDefinition Height="*" Name="RowDefinition1" />
+                        </Grid.RowDefinitions>
+                        <TabPanel IsItemsHost="True" Height="72"
+                                  Margin="10 0"
+                                  Name="HeaderPanel"
+                                  Panel.ZIndex="1"
+                                  KeyboardNavigation.TabIndex="1"
+                                  Grid.Column="0"
+                                  Grid.Row="0" 
+                                  Background="#FFF">
+                        </TabPanel>
+                        <Grid Name="ContentPanel"
+                                  KeyboardNavigation.TabIndex="2"
+                                  KeyboardNavigation.TabNavigation="Local"
+                                  KeyboardNavigation.DirectionalNavigation="Contained"
+                                  Grid.Column="0"
+                                  Grid.Row="1">
+                            <Border Background="#FAFAFA" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="5">
+                                <ContentPresenter Content="{TemplateBinding SelectedContent}"
+                                              ContentTemplate="{TemplateBinding SelectedContentTemplate}"
+                                              ContentStringFormat="{TemplateBinding SelectedContentStringFormat}"
+                                              ContentSource="SelectedContent"
+                                              Name="PART_SelectedContentHost"
+                                              Margin="2"
+                                              SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}" />
+                            </Border>
+                        </Grid>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type TabItem}">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Width" Value="102" />
+        <Setter Property="Margin" Value="0 0 0 -7" />
+        <Setter Property="Foreground" Value="#B7A6B2" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="HeaderTemplate">
+            <Setter.Value>
+                <DataTemplate >
+                    <StackPanel Height="65">
+                        <Image x:Name="tabIcon" VerticalAlignment="Center" Width="30" Height="24" Margin="10 25 10 5" Source="{Binding Content.DataContext.IconScr, RelativeSource={ RelativeSource AncestorType={x:Type TabItem} } }"/>
+                    </StackPanel>
+                    <DataTemplate.Triggers>
+                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type TabItem}}, Path=IsSelected}" Value="True">
+                            <Setter TargetName="tabIcon" Property="Source" Value="{Binding Content.DataContext.SelectedIconScr, RelativeSource={ RelativeSource AncestorType={x:Type TabItem} } }"/>
+                        </DataTrigger>
+                    </DataTemplate.Triggers>
+                </DataTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type TabItem}">
+                    <Border x:Name="PART_Border" Background="{TemplateBinding Background}" BorderThickness="0" BorderBrush="LightGray" Margin="0">
+                        <ContentPresenter ContentSource="Header" Name="TabItemHeader" Margin="0" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="PART_Border" Property="BorderBrush" Value="#004AFF" />
+                            <Setter TargetName="PART_Border" Property="BorderThickness" Value="0 0 0 2" />
+                            <Setter Property="Background">
+                                <Setter.Value>
+                                    <LinearGradientBrush StartPoint="1 0" EndPoint="1 1">
+                                        <GradientStop Color="#FFF" Offset="0"></GradientStop>
+                                        <GradientStop Color="#F8FAFF" Offset="0.5"></GradientStop>
+                                        <GradientStop Color="#F1F5FF" Offset="0.75"></GradientStop>
+                                        <GradientStop Color="#E8EFFF" Offset="1"></GradientStop>
+                                    </LinearGradientBrush>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="TabItemTextToggleStyle" TargetType="{x:Type TextBlock}">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=TabItem}}" Value="True">
+                <Setter Property="Foreground" Value="#0285C4"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=TabItem}}" Value="True">
+                <Setter Property="Foreground" Value="#0285C4"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="{x:Type Thumb}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Thumb}">
+                    <Grid x:Name="Grid">
+                        <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="Auto" Height="Auto" Fill="Transparent" />
+                        <Border x:Name="Rectangle1" CornerRadius="10" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="Auto" Height="Auto"  Background="{TemplateBinding Background}" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Tag" Value="Horizontal">
+                            <Setter TargetName="Rectangle1" Property="Width" Value="Auto" />
+                            <Setter TargetName="Rectangle1" Property="Height" Value="7" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--ScrollBars-->
+    <Style TargetType="{x:Type ScrollBar}">
+        <Setter Property="Stylus.IsFlicksEnabled" Value="false" />
+        <Setter Property="Foreground" Value="LightGray" />
+        <Setter Property="Background" Value="DarkGray" />
+        <Setter Property="Width" Value="6" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ScrollBar}">
+                    <Grid x:Name="GridRoot" Width="10" Background="{TemplateBinding Background}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="0.00001*" />
+                        </Grid.RowDefinitions>
+
+                        <Track x:Name="PART_Track" Grid.Row="0" IsDirectionReversed="true" Focusable="false">
+                            <Track.Thumb>
+                                <Thumb x:Name="Thumb" Background="{TemplateBinding Foreground}" Style="{DynamicResource ScrollThumbs}" />
+                            </Track.Thumb>
+                            <Track.IncreaseRepeatButton>
+                                <RepeatButton x:Name="PageUp" Command="ScrollBar.PageDownCommand" Opacity="0" Focusable="false" />
+                            </Track.IncreaseRepeatButton>
+                            <Track.DecreaseRepeatButton>
+                                <RepeatButton x:Name="PageDown" Command="ScrollBar.PageUpCommand" Opacity="0" Focusable="false" />
+                            </Track.DecreaseRepeatButton>
+                        </Track>
+                    </Grid>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger SourceName="Thumb" Property="IsMouseOver" Value="true">
+                            <Setter Value="{DynamicResource ButtonSelectBrush}" TargetName="Thumb" Property="Background" />
+                        </Trigger>
+                        <Trigger SourceName="Thumb" Property="IsDragging" Value="true">
+                            <Setter Value="{DynamicResource DarkBrush}" TargetName="Thumb" Property="Background" />
+                        </Trigger>
+
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter TargetName="Thumb" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="Orientation" Value="Horizontal">
+                            <Setter TargetName="GridRoot" Property="LayoutTransform">
+                                <Setter.Value>
+                                    <RotateTransform Angle="-90" />
+                                </Setter.Value>
+                            </Setter>
+                            <Setter TargetName="PART_Track" Property="LayoutTransform">
+                                <Setter.Value>
+                                    <RotateTransform Angle="-90" />
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="Width" Value="Auto" />
+                            <Setter Property="Height" Value="12" />
+                            <Setter TargetName="Thumb" Property="Tag" Value="Horizontal" />
+                            <Setter TargetName="PageDown" Property="Command" Value="ScrollBar.PageLeftCommand" />
+                            <Setter TargetName="PageUp" Property="Command" Value="ScrollBar.PageRightCommand" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>
