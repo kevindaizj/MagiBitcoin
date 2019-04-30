@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Prism.Interactivity.InteractionRequest;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -28,5 +29,8 @@ namespace USDTWallet.Views
             this.Name = "Kevin";
             this.Network = "Localhost:8889";
         }
+        
+
+        
     }
 }

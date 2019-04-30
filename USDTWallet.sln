@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "USDTWallet.Common", "USDTWa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "USDTWallet.Biz", "USDTWallet.Biz\USDTWallet.Biz.csproj", "{479DF23C-5F83-45A2-BC10-1146CF8D3987}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "USDTWallet.DataContext", "USDTWallet.DataContext\USDTWallet.DataContext.csproj", "{D64AF319-9FC8-4B96-AD34-CEE0BBE58099}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "USDTWallet.Dao", "USDTWallet.Dao\USDTWallet.Dao.csproj", "{78A8A665-C672-4E49-B8F5-5C9B20C946A6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +37,14 @@ Global
 		{479DF23C-5F83-45A2-BC10-1146CF8D3987}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{479DF23C-5F83-45A2-BC10-1146CF8D3987}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{479DF23C-5F83-45A2-BC10-1146CF8D3987}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D64AF319-9FC8-4B96-AD34-CEE0BBE58099}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D64AF319-9FC8-4B96-AD34-CEE0BBE58099}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D64AF319-9FC8-4B96-AD34-CEE0BBE58099}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D64AF319-9FC8-4B96-AD34-CEE0BBE58099}.Release|Any CPU.Build.0 = Release|Any CPU
+		{78A8A665-C672-4E49-B8F5-5C9B20C946A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{78A8A665-C672-4E49-B8F5-5C9B20C946A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{78A8A665-C672-4E49-B8F5-5C9B20C946A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{78A8A665-C672-4E49-B8F5-5C9B20C946A6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

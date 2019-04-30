@@ -77,7 +77,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers\MD5Helper.cs" />
+    <Compile Include="Helpers\SecureStringHelper.cs" />
     <Compile Include="Operators\BTCOperator.cs" />
+    <Compile Include="Operators\KeyOperator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -2,8 +2,31 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:USDTWallet"
-             xmlns:prism="http://prismlibrary.com/">
+             xmlns:prism="http://prismlibrary.com/"
+             xmlns:converter="clr-namespace:USDTWallet.ValueConverters">
     <Application.Resources>
-         
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="CommonStyle.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+            <converter:PipedValueConverterGroup x:Key="InverseBoolToVisibility" >
+                <converter:InverseBooleanConverter />
+                <BooleanToVisibilityConverter />
+            </converter:PipedValueConverterGroup>
+            <converter:NullOrEmptyConverter x:Key="NullOrEmptyConverter" />
+
+            <converter:PipedValueConverterGroup x:Key="NullBoolToVisibility" >
+                <converter:NullToBooleanConverter />
+                <BooleanToVisibilityConverter />
+            </converter:PipedValueConverterGroup>
+            <converter:PipedValueConverterGroup x:Key="InverseNullBoolToVisibility" >
+                <converter:NullToBooleanConverter />
+                <converter:InverseBooleanConverter />
+                <BooleanToVisibilityConverter />
+            </converter:PipedValueConverterGroup>
+            
+        </ResourceDictionary>
     </Application.Resources>
 </prism:PrismApplication>

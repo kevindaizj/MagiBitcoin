@@ -3,7 +3,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:prism="http://prismlibrary.com/"             
+             xmlns:prism="http://prismlibrary.com/"        
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:popup="clr-namespace:USDTWallet.Views.Popups.Wallets"
              prism:ViewModelLocator.AutoWireViewModel="True"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
@@ -12,4 +14,13 @@
             <TextBlock Text="Home"></TextBlock>
         </StackPanel>
     </Grid>
+
+    <!-- Popup Triggers -->
+    <i:Interaction.Triggers>
+        <prism:InteractionRequestTrigger SourceObject="{Binding CreateAccountPopupRequest}" >
+            <prism:PopupWindowAction IsModal="True" CenterOverAssociatedObject="True"  WindowContentType="{x:Type popup:CreateWallet}" WindowStartupLocation="CenterScreen">
+            </prism:PopupWindowAction>
+        </prism:InteractionRequestTrigger>
+    </i:Interaction.Triggers>
+    
 </UserControl>

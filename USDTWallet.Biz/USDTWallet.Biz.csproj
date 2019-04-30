@@ -80,11 +80,16 @@
     <Compile Include="Accounts\AccountManager.cs" />
     <Compile Include="Common\BizBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Wallet\WalletManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\USDTWallet.Common\USDTWallet.Common.csproj">
       <Project>{2a0005fa-4665-487f-a24a-8ee7a0c1a82e}</Project>
       <Name>USDTWallet.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\USDTWallet.Dao\USDTWallet.Dao.csproj">
+      <Project>{78a8a665-c672-4e49-b8f5-5c9b20c946a6}</Project>
+      <Name>USDTWallet.Dao</Name>
     </ProjectReference>
     <ProjectReference Include="..\USDTWallet.Models\USDTWallet.Models.csproj">
       <Project>{12ebf84c-cc08-41ce-a4f4-3554c2d774d2}</Project>

@@ -1,0 +1,43 @@
+﻿<UserControl x:Class="USDTWallet.Views.Popups.Wallets.CreateWallet"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:prism="http://prismlibrary.com/"
+             xmlns:behavior="clr-namespace:USDTWallet.Behaviors"
+             xmlns:local="clr-namespace:USDTWallet.Views.Popups.Wallets"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             mc:Ignorable="d" 
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid Width="470" Height="208">
+        <StackPanel Margin="10 30">
+            <StackPanel Visibility="{Binding IsCreating, Converter={StaticResource InverseBoolToVisibility}}">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Width="110" TextAlignment="Right" Margin="0 0 6 0" VerticalAlignment="Center">密码：</TextBlock>
+                    <PasswordBox Width="260" Height="28" VerticalContentAlignment="Center">
+                        <i:Interaction.Behaviors>
+                            <behavior:PasswordBoxBehavior TransferPassword="{Binding Password, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay }" />
+                        </i:Interaction.Behaviors>
+                    </PasswordBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0 20 0 0">
+                    <TextBlock Width="110" TextAlignment="Right" Margin="0 0 6 0"  VerticalAlignment="Center">确认密码：</TextBlock>
+                    <PasswordBox Width="260" Height="28" VerticalContentAlignment="Center">
+                        <i:Interaction.Behaviors>
+                            <behavior:PasswordBoxBehavior TransferPassword="{Binding ConfirmPassword, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay }" />
+                        </i:Interaction.Behaviors>
+                    </PasswordBox>
+                </StackPanel>
+                <StackPanel  Margin="0 30 0 0">
+                    <Button Width="190" Height="28" Command="{Binding ConfirmCommand}">确认</Button>
+                </StackPanel>
+            </StackPanel>
+
+            <TextBlock Margin="50" HorizontalAlignment="Center" FontSize="20" Visibility="{Binding IsCreating, Converter={StaticResource BoolToVisibility}}">
+                账户正在创建中...
+            </TextBlock>
+
+        </StackPanel>
+    </Grid>
+</UserControl>
