@@ -94,9 +94,9 @@
     <None Include="Context\WalletContext.edmx.diagram">
       <DependentUpon>WalletContext.edmx</DependentUpon>
     </None>
-    <None Include="Datas\wallet.db">
+    <Content Include="Datas\wallet.db">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </Content>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

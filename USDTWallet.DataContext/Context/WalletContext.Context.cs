@@ -25,7 +25,7 @@ namespace USDTWallet.DataContext.Context
             throw new UnintentionalCodeFirstException();
         }
     
-        public virtual DbSet<BASE_WALLET> BASE_WALLET { get; set; }
         public virtual DbSet<BASE_ADDRESS> BASE_ADDRESS { get; set; }
+        public virtual DbSet<BASE_WALLET> BASE_WALLET { get; set; }
     }
 }

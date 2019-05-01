@@ -92,6 +92,9 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="WpfAnimatedGif, Version=1.4.18.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WpfAnimatedGif.1.4.18\lib\net\WpfAnimatedGif.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -102,7 +105,9 @@
     <Compile Include="Common\ControllerBase.cs" />
     <Compile Include="Common\DispatcherHelper.cs" />
     <Compile Include="ControlService\MsgBox\MessageBoxService.cs" />
+    <Compile Include="Events\UIEvents.cs" />
     <Compile Include="PopupNotifications\WalletInitNotification.cs" />
+    <Compile Include="StartupConfigs\PrerequisiteDataDirectoryConfig.cs" />
     <Compile Include="StartupConfigs\ServiceRegisterConfig.cs" />
     <Compile Include="StartupConfigs\ViewControllerLocatorConfig.cs" />
     <Compile Include="StartupConfigs\ViewRegionConfig.cs" />
@@ -147,6 +152,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Home\HomePage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Home\HomePageStyle.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -226,6 +235,17 @@
     <Resource Include="Images\token_blue.png" />
     <Resource Include="Images\transfer.png" />
     <Resource Include="Images\transfer_blue.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\cry_face.png" />
+    <Resource Include="Images\loading.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\avatar.png" />
+    <Resource Include="Images\plus.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\account_bg.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\System.Data.SQLite.Core.1.0.110.0\build\net46\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.110.0\build\net46\System.Data.SQLite.Core.targets')" />

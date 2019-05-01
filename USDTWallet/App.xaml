@@ -26,6 +26,10 @@
                 <converter:InverseBooleanConverter />
                 <BooleanToVisibilityConverter />
             </converter:PipedValueConverterGroup>
+
+            <ControlTemplate x:Key="NoScrollList">
+                <ItemsPresenter></ItemsPresenter>
+            </ControlTemplate>
             
         </ResourceDictionary>
     </Application.Resources>

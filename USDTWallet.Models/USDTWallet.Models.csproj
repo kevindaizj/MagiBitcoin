@@ -46,9 +46,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\ViewModelBase.cs" />
+    <Compile Include="Enums\Address\AddressCategory.cs" />
+    <Compile Include="Enums\Address\CustomAddressType.cs" />
     <Compile Include="Enums\Network\NetworkType.cs" />
     <Compile Include="Models\Accounts\AccountVM.cs" />
     <Compile Include="Models\Addresses\AddressInfo.cs" />
+    <Compile Include="Models\Addresses\AddressVM.cs" />
     <Compile Include="Models\Mnemonics\MnemonicResult.cs" />
     <Compile Include="Models\Wallets\WalletInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

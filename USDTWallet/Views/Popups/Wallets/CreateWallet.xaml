@@ -47,7 +47,7 @@
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="0 5 0 0">
                     <TextBlock Width="60" TextAlignment="Right" Margin="0 0 10 0"  VerticalAlignment="Top">助记词:</TextBlock>
-                    <TextBox Width="330" Height="90" IsReadOnly="True" Text="{Binding MnemonicWords}"></TextBox>
+                    <TextBox Width="330" Height="90" IsReadOnly="True" Text="{Binding MnemonicWords}" TextWrapping="Wrap"></TextBox>
                 </StackPanel>
                 <StackPanel Margin="70 5 0 0">
                     <TextBlock Foreground="Red">请妥善记录好助记词，为安全起见，系统将不会为您保存</TextBlock>

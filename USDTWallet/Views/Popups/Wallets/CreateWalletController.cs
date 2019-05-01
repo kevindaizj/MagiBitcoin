@@ -91,6 +91,9 @@ namespace USDTWallet.Views.Popups.Wallets
 
         private void CreateWallet()
         {
+            if (null == Password || null == ConfirmPassword)
+                return;
+
             var pwd = SecureStringHelper.SecureStringToString(Password);
             var confimrPwd = SecureStringHelper.SecureStringToString(ConfirmPassword);
             if (pwd != confimrPwd)
@@ -110,8 +113,12 @@ namespace USDTWallet.Views.Popups.Wallets
 
         private void CloseWin()
         {
-            this._notification.Success = true;
-            FinishInteraction?.Invoke();
+            MessageBoxService.Confirm("请务必记录下助记词。是否确定关闭？", () =>
+            {
+                this._notification.Success = true;
+                FinishInteraction?.Invoke();
+            });
+            
         }
     }
 }

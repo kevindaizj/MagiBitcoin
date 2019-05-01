@@ -17,8 +17,11 @@ namespace USDTWallet.DataContext.Context
         public string ID { get; set; }
         public string ADDRESS { get; set; }
         public string WALLET_ID { get; set; }
-        public string KEY_PATH { get; set; }
         public long NETWORK { get; set; }
+        public string KEY_PATH { get; set; }
+        public long PATH_INDEX { get; set; }
+        public long ADDRESS_TYPE { get; set; }
+        public long ADDRESS_CATEGORY { get; set; }
         public string NAME { get; set; }
         public double BALANCE { get; set; }
         public string ACCOUNT { get; set; }

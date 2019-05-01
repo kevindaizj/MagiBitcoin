@@ -78,6 +78,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Accounts\AccountManager.cs" />
+    <Compile Include="Addresses\AddressManager.cs" />
     <Compile Include="Common\BizBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Wallet\WalletManager.cs" />

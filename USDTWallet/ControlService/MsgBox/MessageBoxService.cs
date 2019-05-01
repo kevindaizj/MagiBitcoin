@@ -18,5 +18,20 @@ namespace USDTWallet.ControlService.MsgBox
         {
             MessageBox.Show(messageBoxText, caption);
         }
+
+        public void Confirm(string messageBoxText, Action confirmCallback = null, Action cancelCallback = null, string caption = "确认")
+        {
+            var result = MessageBox.Show(messageBoxText, caption, MessageBoxButton.YesNo);
+            if (result == MessageBoxResult.Yes)
+            {
+                if (null != confirmCallback)
+                    confirmCallback.Invoke();
+            }
+            else
+            {
+                if (null != cancelCallback)
+                    cancelCallback.Invoke();
+            }
+        }
     }
 }

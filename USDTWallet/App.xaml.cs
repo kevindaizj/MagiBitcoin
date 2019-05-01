@@ -18,10 +18,12 @@ namespace USDTWallet
     /// </summary>
     public partial class App : PrismApplication
     {
-        protected override Window CreateShell()
+        protected override void OnStartup(StartupEventArgs e)
         {
-            return Container.Resolve<MainWindow>();
+            PrerequisiteDataDirectoryConfig.Config();
+            base.OnStartup(e);
         }
+        
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
@@ -33,6 +35,11 @@ namespace USDTWallet
         {
             base.ConfigureServiceLocator();
             ViewControllerLocatorConfig.Config();
+        }
+
+        protected override Window CreateShell()
+        {
+            return Container.Resolve<MainWindow>();
         }
 
         protected override void InitializeShell(Window shell)

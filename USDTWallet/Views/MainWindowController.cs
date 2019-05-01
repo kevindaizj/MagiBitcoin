@@ -1,12 +1,16 @@
 ﻿using Prism.Commands;
+using Prism.Events;
 using Prism.Interactivity.InteractionRequest;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using USDTWallet.Biz.Wallet;
 using USDTWallet.Common;
+using USDTWallet.Common.Helpers;
+using USDTWallet.Events;
 using USDTWallet.PopupNotifications;
 
 namespace USDTWallet.Views
@@ -17,6 +21,8 @@ namespace USDTWallet.Views
         public InteractionRequest<WalletInitNotification> LoginWalletPopupRequest { get; set; }
 
         public DelegateCommand OnLoadCommand { get; set; }
+
+        public DelegateCommand OpenDatabaseDirCommand { get; set; }
 
         private string name;
         public string Name
@@ -31,19 +37,24 @@ namespace USDTWallet.Views
             get { return network; }
             set { SetProperty(ref network, value); }
         }
+        
 
         private WalletManager WalletManager { get; set; }
 
-        public MainWindowController(WalletManager walletManager)
+        private IEventAggregator EventAggregator { get; set; }
+
+        public MainWindowController(WalletManager walletManager, IEventAggregator eventAggregator)
         {
             this.Name = "Kevin";
             this.Network = "Localhost:8889";
             this.CreateWalletPopupRequest = new InteractionRequest<WalletInitNotification>();
             this.LoginWalletPopupRequest = new InteractionRequest<WalletInitNotification>();
             this.OnLoadCommand = new DelegateCommand(OnLoadHandler);
+            this.OpenDatabaseDirCommand = new DelegateCommand(OpenDatabaseDirectory);
             this.WalletManager = walletManager;
+            this.EventAggregator = eventAggregator;
         }
-
+        
         private void OnLoadHandler()
         {
             bool hasWallet = WalletManager.CheckAnyWalletExisted();
@@ -58,9 +69,16 @@ namespace USDTWallet.Views
             }
         }
 
-        private void Callback(WalletInitNotification obj)
+        private void Callback(WalletInitNotification notification)
         {
-            var a = "";
+            if (notification.Success)
+                this.EventAggregator.GetEvent<LoginSuccessEvent>().Publish();
+        }
+
+        private void OpenDatabaseDirectory()
+        {
+            var path = DataDirectoryHelper.GetDatabaseDirectoryPath();
+            System.Diagnostics.Process.Start(path);
         }
     }
 }

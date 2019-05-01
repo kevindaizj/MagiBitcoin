@@ -8,6 +8,7 @@ using USDTWallet.Common.Helpers;
 using USDTWallet.Common.Operators;
 using USDTWallet.Dao.Address;
 using USDTWallet.Dao.Wallet;
+using USDTWallet.Models.Enums.Address;
 using USDTWallet.Models.Models.Addresses;
 using USDTWallet.Models.Models.Mnemonics;
 using USDTWallet.Models.Models.Wallets;
@@ -45,8 +46,11 @@ namespace USDTWallet.Biz.Wallet
                 Id = Guid.NewGuid().ToString("N"),
                 Address = result.RootAddress,
                 WalletId = wallet.Id,
+                Network = result.Network,
                 KeyPath = null,
-                Network = result.Network
+                AddressType = (long)CustomAddressType.Root,
+                AddressCategory = (long)AddressCategory.Default, 
+                Name = "Coinbase"
             };
 
             WalletDao.Create(wallet);
