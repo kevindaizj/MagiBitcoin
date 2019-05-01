@@ -54,5 +54,18 @@ namespace USDTWallet.Biz.Wallet
 
             return result;
         }
+
+        public WalletInfo GetActiveWallet()
+        {
+            return WalletDao.GetActiveWallet();
+        }
+
+        public bool Login(string pwd)
+        {
+            var wallet = WalletDao.GetActiveWallet();
+            if (MD5Helper.ToMD5(pwd) != wallet.Password)
+                return false;
+            return true;
+        }
     }
 }

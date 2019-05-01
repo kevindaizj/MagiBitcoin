@@ -5,6 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:prism="http://prismlibrary.com/"
         xmlns:local="clr-namespace:USDTWallet.Views"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:popup="clr-namespace:USDTWallet.Views.Popups.Wallets"
         prism:ViewModelLocator.AutoWireViewModel="True"
         mc:Ignorable="d"
         Title="USDT Wallet" Height="620" Width="1236" MinWidth="940" WindowStartupLocation="CenterScreen">
@@ -24,7 +26,7 @@
 
         <Menu Grid.Row="0" IsMainMenu="True">
             <MenuItem Header="账户">
-                <MenuItem Header="新建账户" InputGestureText="Ctrl + N" />
+                <MenuItem Header="新建账户" Command="{Binding OnLoadCommand}" InputGestureText="Ctrl + N" />
                 <MenuItem Header="导入账户" InputGestureText="Ctrl + I" />
                 <MenuItem Header="打开日志"  />
                 <Separator/>
@@ -56,7 +58,33 @@
 
     </Grid>
 
-
+    <!-- Popup Triggers -->
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding OnLoadCommand}" />
+        </i:EventTrigger>
+        <prism:InteractionRequestTrigger SourceObject="{Binding CreateWalletPopupRequest}">
+            <prism:PopupWindowAction IsModal="True" CenterOverAssociatedObject="True"  WindowContentType="{x:Type popup:CreateWallet}" WindowStartupLocation="CenterScreen">
+                <prism:PopupWindowAction.WindowStyle>
+                    <Style TargetType="{x:Type Window}">
+                        <Setter Property="ResizeMode" Value="NoResize"/>
+                        <Setter Property="SizeToContent" Value="WidthAndHeight"/>
+                    </Style>
+                </prism:PopupWindowAction.WindowStyle>
+            </prism:PopupWindowAction>
+        </prism:InteractionRequestTrigger>
+        <prism:InteractionRequestTrigger SourceObject="{Binding LoginWalletPopupRequest}">
+            <prism:PopupWindowAction IsModal="True" CenterOverAssociatedObject="True"  WindowContentType="{x:Type popup:LoginWallet}" WindowStartupLocation="CenterScreen">
+                <prism:PopupWindowAction.WindowStyle>
+                    <Style TargetType="{x:Type Window}">
+                        <Setter Property="ResizeMode" Value="NoResize"/>
+                        <Setter Property="SizeToContent" Value="WidthAndHeight"/>
+                    </Style>
+                </prism:PopupWindowAction.WindowStyle>
+            </prism:PopupWindowAction>
+        </prism:InteractionRequestTrigger>
+        
+    </i:Interaction.Triggers>
     
 
 </Window>

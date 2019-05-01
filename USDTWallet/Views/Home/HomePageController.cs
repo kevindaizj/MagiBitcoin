@@ -1,4 +1,5 @@
-﻿using Prism.Interactivity.InteractionRequest;
+﻿using Prism.Commands;
+using Prism.Interactivity.InteractionRequest;
 using Prism.Regions;
 using System;
 using System.Collections.Generic;
@@ -18,7 +19,8 @@ namespace USDTWallet.Views.Home
         public string IconScr { get { return "/Images/home.png"; } }
         public string SelectedIconScr { get { return "/Images/home_blue.png"; } }
 
-        public InteractionRequest<INotification> CreateWalletPopupRequest { get; set; }
+        //public InteractionRequest<INotification> CreateWalletPopupRequest { get; set; }
+        //public DelegateCommand OnLoadCommand { get; set; }
 
         public WalletManager WalletManager { get; set; }
 
@@ -28,30 +30,18 @@ namespace USDTWallet.Views.Home
         {
             this.WalletManager = walletManager;
             this.MsgBox = msgBox;
-            this.CreateWalletPopupRequest = new InteractionRequest<INotification>();
-            this.MsgBox.Show("hello");
-            CreateWalletPopupRequest.Raise(new Notification { Title = "创建新钱包" });
+            //this.CreateWalletPopupRequest = new InteractionRequest<INotification>();
+            //this.OnLoadCommand = new DelegateCommand(onLoadHandler);
+            ////this.MsgBox.Show("hello");
+            //CreateWalletPopupRequest.Raise(new Notification { Title = "创建新钱包" });
         }
 
-        public override void OnNavigatedFrom(NavigationContext navigationContext)
+        private void onLoadHandler()
         {
-            bool hasWallet = WalletManager.CheckAnyWalletExisted();
-            if (!hasWallet)
-            {
-                System.Threading.Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("en-us");
-                DispatcherHelper.Invoke(() =>
-                {
-                    this.MsgBox.Show("hello");
-                    CreateWalletPopupRequest.Raise(new Notification { Title = "创建新钱包" });
-                });
-
-                //var result = WalletManager.CreateWallet("");
-            }
+            //this.MsgBox.Show("hello ");
+            //CreateWalletPopupRequest.Raise(new Notification { Title = "创建新钱包" });
         }
 
-        //protected override void On()
-        //{
-            
-        //}
+        
     }
 }

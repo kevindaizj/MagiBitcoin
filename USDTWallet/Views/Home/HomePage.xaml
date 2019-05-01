@@ -16,11 +16,14 @@
     </Grid>
 
     <!-- Popup Triggers -->
-    <i:Interaction.Triggers>
+    <!--<i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding OnLoadCommand}" />
+        </i:EventTrigger>
         <prism:InteractionRequestTrigger SourceObject="{Binding CreateAccountPopupRequest}" >
             <prism:PopupWindowAction IsModal="True" CenterOverAssociatedObject="True"  WindowContentType="{x:Type popup:CreateWallet}" WindowStartupLocation="CenterScreen">
             </prism:PopupWindowAction>
         </prism:InteractionRequestTrigger>
-    </i:Interaction.Triggers>
+    </i:Interaction.Triggers>-->
     
 </UserControl>

@@ -102,6 +102,7 @@
     <Compile Include="Common\ControllerBase.cs" />
     <Compile Include="Common\DispatcherHelper.cs" />
     <Compile Include="ControlService\MsgBox\MessageBoxService.cs" />
+    <Compile Include="PopupNotifications\WalletInitNotification.cs" />
     <Compile Include="StartupConfigs\ServiceRegisterConfig.cs" />
     <Compile Include="StartupConfigs\ViewControllerLocatorConfig.cs" />
     <Compile Include="StartupConfigs\ViewRegionConfig.cs" />
@@ -129,6 +130,10 @@
       <DependentUpon>CreateWallet.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Popups\Wallets\CreateWalletController.cs" />
+    <Compile Include="Views\Popups\Wallets\LoginWallet.xaml.cs">
+      <DependentUpon>LoginWallet.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Popups\Wallets\LoginWalletController.cs" />
     <Compile Include="Views\USDT\USDTPage.xaml.cs">
       <DependentUpon>USDTPage.xaml</DependentUpon>
     </Compile>
@@ -154,6 +159,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Popups\Wallets\CreateWallet.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Popups\Wallets\LoginWallet.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
