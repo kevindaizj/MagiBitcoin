@@ -24,6 +24,8 @@ namespace USDTWallet.Views
 
         public DelegateCommand OpenDatabaseDirCommand { get; set; }
 
+        public DelegateCommand<string> CreateAddressCommand { get; set; }
+
         private string name;
         public string Name
         {

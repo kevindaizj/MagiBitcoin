@@ -11,6 +11,7 @@ namespace USDTWallet.Models.Models.Mnemonics
     {
         public string[] MnemonicWords { get; set; }
         public string RootAddress { get; set; }
+        public string RootExtPubKeyWif { get; set; }
         public int Network { get; set; }
     }
 }

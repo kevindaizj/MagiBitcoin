@@ -5,7 +5,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:prism="http://prismlibrary.com/"        
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-             xmlns:popup="clr-namespace:USDTWallet.Views.Popups.Wallets"
+             xmlns:popup="clr-namespace:USDTWallet.Views.Popups.Addresses"
              prism:ViewModelLocator.AutoWireViewModel="True"
              xmlns:gif="http://wpfanimatedgif.codeplex.com" 
              mc:Ignorable="d" 
@@ -52,7 +52,7 @@
                     <TextBlock FontSize="20" Margin="0 10 0 0" Foreground="#333333" Text="公司地址"></TextBlock>
 
                     <StackPanel Margin="0 10 0 0" Visibility="{Binding ShowLoading, Converter={StaticResource InverseBoolToVisibility}}">
-                        <Border HorizontalAlignment="Left" Style="{StaticResource AddNewAccItemStyle}" Visibility="{Binding AnyAccounts, Converter={StaticResource InverseBoolToVisibility}}">
+                        <Border HorizontalAlignment="Left" Style="{StaticResource AddNewAccItemStyle}">
                             <TextBlock Width="268" Height="100" FontSize="21" Foreground="#FFF">
                                 <TextBlock.InputBindings>
                                     <MouseBinding MouseAction="LeftClick" Command="{Binding CreateAddressCommand}" CommandParameter="1" />
@@ -63,10 +63,10 @@
                             </StackPanel>
                         </TextBlock>
                         </Border>
-                        
 
-                        <ListView ItemsSource="{Binding AccountList}" ItemContainerStyle="{StaticResource AccountListItemStyle}" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                        BorderThickness="0 0 0 0" Background="Transparent" FontWeight="Normal" Visibility="{Binding AnyAccounts, Converter={StaticResource BoolToVisibility}}"
+
+                        <ListView ItemsSource="{Binding CompanyAddresses}" ItemContainerStyle="{StaticResource AccountListItemStyle}" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                        BorderThickness="0 0 0 0" Background="Transparent" FontWeight="Normal" Visibility="{Binding AnyCompanyAddress, Converter={StaticResource BoolToVisibility}}"
                         Template="{StaticResource NoScrollList}">
                             <ListView.ItemsPanel>
                                 <ItemsPanelTemplate>
@@ -89,7 +89,7 @@
                                             />
                                             <StackPanel Orientation="Horizontal" Margin="0 6 0 3">
                                                 <TextBlock Text="{Binding Balance}" FontSize="12" Foreground="#FFF" MaxWidth="115" TextTrimming="CharacterEllipsis" />
-                                                <TextBlock Margin="3 0" Foreground="#FFF" FontSize="12">ETHER</TextBlock>
+                                                <TextBlock Margin="3 0" Foreground="#FFF" FontSize="12">BTC</TextBlock>
                                             </StackPanel>
                                             <TextBlock Text="{Binding Address}" FontSize="12" TextTrimming="CharacterEllipsis" Width="155" Foreground="#fff" />
                                         </StackPanel>
@@ -107,7 +107,7 @@
                     <TextBlock FontSize="20" Margin="0 10 0 0" Foreground="#333333" Text="客户地址"></TextBlock>
 
                     <StackPanel Margin="0 10 0 0" Visibility="{Binding ShowLoading, Converter={StaticResource InverseBoolToVisibility}}">
-                        <Border HorizontalAlignment="Left" Style="{StaticResource AddNewAccItemStyle}" Visibility="{Binding AnyAccounts, Converter={StaticResource InverseBoolToVisibility}}">
+                        <Border HorizontalAlignment="Left" Style="{StaticResource AddNewAccItemStyle}" >
                             <TextBlock Width="268" Height="100" FontSize="21" Foreground="#FFF">
                                 <TextBlock.InputBindings>
                                     <MouseBinding MouseAction="LeftClick" Command="{Binding CreateAddressCommand}" CommandParameter="2" />
@@ -119,8 +119,8 @@
                         </TextBlock>
                         </Border>
 
-                        <ListView ItemsSource="{Binding AccountList}" ItemContainerStyle="{StaticResource AccountListItemStyle}" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                        BorderThickness="0 0 0 0" Background="Transparent" FontWeight="Normal" Visibility="{Binding AnyAccounts, Converter={StaticResource BoolToVisibility}}"
+                        <ListView ItemsSource="{Binding CustomerAddresses}" ItemContainerStyle="{StaticResource AccountListItemStyle}" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                        BorderThickness="0 0 0 0" Background="Transparent" FontWeight="Normal" Visibility="{Binding AnyCustomerAddress, Converter={StaticResource BoolToVisibility}}"
                         Template="{StaticResource NoScrollList}">
                             <ListView.ItemsPanel>
                                 <ItemsPanelTemplate>
@@ -143,7 +143,7 @@
                                             />
                                             <StackPanel Orientation="Horizontal" Margin="0 6 0 3">
                                                 <TextBlock Text="{Binding Balance}" FontSize="12" Foreground="#FFF" MaxWidth="115" TextTrimming="CharacterEllipsis" />
-                                                <TextBlock Margin="3 0" Foreground="#FFF" FontSize="12">ETHER</TextBlock>
+                                                <TextBlock Margin="3 0" Foreground="#FFF" FontSize="12">BTC</TextBlock>
                                             </StackPanel>
                                             <TextBlock Text="{Binding Address}" FontSize="12" TextTrimming="CharacterEllipsis" Width="155" Foreground="#fff" />
                                         </StackPanel>
@@ -160,4 +160,13 @@
             </StackPanel>
         </Grid>
     </ScrollViewer>
+
+    <!-- Popup Triggers -->
+    <i:Interaction.Triggers>
+        <prism:InteractionRequestTrigger SourceObject="{Binding CreateAddressPopupRequest}">
+            <prism:PopupWindowAction IsModal="True" CenterOverAssociatedObject="True"  WindowContentType="{x:Type popup:CreateAddress}" WindowStartupLocation="CenterScreen">
+            </prism:PopupWindowAction>
+        </prism:InteractionRequestTrigger>
+    </i:Interaction.Triggers>
+
 </UserControl>

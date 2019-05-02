@@ -23,9 +23,11 @@ namespace USDTWallet.Dao.Address
                             {
                                 Id = a.ID,
                                 Address = a.ADDRESS,
+                                ExtPubKeyWif = a.EXTPUBKEY_WIF,
                                 WalletId = a.WALLET_ID,
                                 Network = a.NETWORK,
                                 KeyPath = a.KEY_PATH,
+                                ParentKeyPath = a.PARENT_KEY_PATH,
                                 PathIndex = a.PATH_INDEX,
                                 AddressType = a.ADDRESS_TYPE,
                                 AddressCategory = a.ADDRESS_CATEGORY,
@@ -50,6 +52,7 @@ namespace USDTWallet.Dao.Address
                             {
                                 Id = a.ID,
                                 Address = a.ADDRESS,
+                                ExtPubKeyWif = a.EXTPUBKEY_WIF,
                                 WalletId = a.WALLET_ID,
                                 Network = a.NETWORK,
                                 KeyPath = a.KEY_PATH,
@@ -77,9 +80,11 @@ namespace USDTWallet.Dao.Address
                             {
                                 Id = a.ID,
                                 Address = a.ADDRESS,
+                                ExtPubKeyWif = a.EXTPUBKEY_WIF,
                                 WalletId = a.WALLET_ID,
                                 Network = a.NETWORK,
                                 KeyPath = a.KEY_PATH,
+                                ParentKeyPath = a.PARENT_KEY_PATH,
                                 PathIndex = a.PATH_INDEX,
                                 AddressType = a.ADDRESS_TYPE,
                                 AddressCategory = a.ADDRESS_CATEGORY,
@@ -101,9 +106,11 @@ namespace USDTWallet.Dao.Address
                 {
                     ID = model.Id,
                     ADDRESS = model.Address,
+                    EXTPUBKEY_WIF = model.ExtPubKeyWif,
                     WALLET_ID = model.WalletId,
                     NETWORK = model.Network,
                     KEY_PATH = model.KeyPath,
+                    PARENT_KEY_PATH = model.KeyPath,
                     PATH_INDEX = model.PathIndex,
                     ADDRESS_TYPE = model.AddressType,
                     ADDRESS_CATEGORY = model.AddressCategory,
@@ -118,5 +125,20 @@ namespace USDTWallet.Dao.Address
                 db.SaveChanges();
             }
         }
+
+
+        public long GetMaxPathIndex(string walletId, string parentKeyPath)
+        {
+            using (var db = this.GetWalletContext())
+            {
+                var query = from a in db.BASE_ADDRESS
+                            where a.WALLET_ID == walletId &&
+                                  a.PARENT_KEY_PATH == parentKeyPath
+                            select a.PATH_INDEX;
+
+                return query.DefaultIfEmpty(0).Max();
+            }
+        }
+
     }
 }

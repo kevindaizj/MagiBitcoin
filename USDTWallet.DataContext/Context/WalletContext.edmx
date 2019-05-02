@@ -4,16 +4,18 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="WalletModel.Store" Provider="System.Data.SQLite.EF6" ProviderManifestToken="Data Source=C:\ABitcoinProject\USDTWallet.DataContext\Datas\wallet.db" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+      <Schema Namespace="WalletModel.Store" Provider="System.Data.SQLite.EF6" ProviderManifestToken="Data Source=C:\Users\user\source\repos\USDTWallet\USDTWallet.DataContext\Datas\wallet.db3" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="BASE_ADDRESS">
           <Key>
             <PropertyRef Name="ID" />
           </Key>
           <Property Name="ID" Type="varchar" MaxLength="50" Nullable="false" />
           <Property Name="ADDRESS" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="EXTPUBKEY_WIF" Type="nvarchar" MaxLength="200" />
           <Property Name="WALLET_ID" Type="varchar" MaxLength="50" />
           <Property Name="NETWORK" Type="integer" Nullable="false" />
           <Property Name="KEY_PATH" Type="nvarchar" MaxLength="500" />
+          <Property Name="PARENT_KEY_PATH" Type="nvarchar" MaxLength="500" />
           <Property Name="PATH_INDEX" Type="integer" Nullable="false" />
           <Property Name="ADDRESS_TYPE" Type="integer" Nullable="false" />
           <Property Name="ADDRESS_CATEGORY" Type="integer" Nullable="false" />
@@ -39,23 +41,22 @@
           <EntitySet Name="BASE_ADDRESS" EntityType="Self.BASE_ADDRESS" store:Type="Tables" />
           <EntitySet Name="BASE_WALLET" EntityType="Self.BASE_WALLET" store:Type="Tables" />
         </EntityContainer>
-      </Schema></edmx:StorageModels>
+      </Schema>
+    </edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="WalletModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
-        <EntityContainer Name="WalletContext" annotation:LazyLoadingEnabled="true">
-          <EntitySet Name="BASE_ADDRESS" EntityType="WalletModel.BASE_ADDRESS" />
-          <EntitySet Name="BASE_WALLET" EntityType="WalletModel.BASE_WALLET" />
-        </EntityContainer>
         <EntityType Name="BASE_ADDRESS">
           <Key>
             <PropertyRef Name="ID" />
           </Key>
-          <Property Name="ID" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="ADDRESS" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="ID" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="ADDRESS" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="EXTPUBKEY_WIF" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
           <Property Name="WALLET_ID" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="NETWORK" Type="Int64" Nullable="false" />
           <Property Name="KEY_PATH" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="PARENT_KEY_PATH" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
           <Property Name="PATH_INDEX" Type="Int64" Nullable="false" />
           <Property Name="ADDRESS_TYPE" Type="Int64" Nullable="false" />
           <Property Name="ADDRESS_CATEGORY" Type="Int64" Nullable="false" />
@@ -69,14 +70,18 @@
           <Key>
             <PropertyRef Name="ID" />
           </Key>
-          <Property Name="ID" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="WALLET_NAME" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
-          <Property Name="PASSWORD" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="ID" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="WALLET_NAME" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="PASSWORD" Type="String" MaxLength="200" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="MNEMONIC_WORDS" Type="String" MaxLength="2147483647" FixedLength="false" Unicode="true" />
           <Property Name="DESCRIPTION" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
           <Property Name="IS_ACTIVE" Type="Boolean" Nullable="false" />
           <Property Name="CREATE_DATE" Type="DateTime" Nullable="false" />
         </EntityType>
+        <EntityContainer Name="WalletContext" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="BASE_ADDRESS" EntityType="Self.BASE_ADDRESS" />
+          <EntitySet Name="BASE_WALLET" EntityType="Self.BASE_WALLET" />
+        </EntityContainer>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -86,32 +91,34 @@
           <EntitySetMapping Name="BASE_ADDRESS">
             <EntityTypeMapping TypeName="WalletModel.BASE_ADDRESS">
               <MappingFragment StoreEntitySet="BASE_ADDRESS">
-                <ScalarProperty Name="CREATE_DATE" ColumnName="CREATE_DATE" />
-                <ScalarProperty Name="DESCRIPTION" ColumnName="DESCRIPTION" />
-                <ScalarProperty Name="ACCOUNT" ColumnName="ACCOUNT" />
-                <ScalarProperty Name="BALANCE" ColumnName="BALANCE" />
-                <ScalarProperty Name="NAME" ColumnName="NAME" />
-                <ScalarProperty Name="ADDRESS_CATEGORY" ColumnName="ADDRESS_CATEGORY" />
-                <ScalarProperty Name="ADDRESS_TYPE" ColumnName="ADDRESS_TYPE" />
-                <ScalarProperty Name="PATH_INDEX" ColumnName="PATH_INDEX" />
-                <ScalarProperty Name="KEY_PATH" ColumnName="KEY_PATH" />
-                <ScalarProperty Name="NETWORK" ColumnName="NETWORK" />
-                <ScalarProperty Name="WALLET_ID" ColumnName="WALLET_ID" />
-                <ScalarProperty Name="ADDRESS" ColumnName="ADDRESS" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="ADDRESS" ColumnName="ADDRESS" />
+                <ScalarProperty Name="EXTPUBKEY_WIF" ColumnName="EXTPUBKEY_WIF" />
+                <ScalarProperty Name="WALLET_ID" ColumnName="WALLET_ID" />
+                <ScalarProperty Name="NETWORK" ColumnName="NETWORK" />
+                <ScalarProperty Name="KEY_PATH" ColumnName="KEY_PATH" />
+                <ScalarProperty Name="PARENT_KEY_PATH" ColumnName="PARENT_KEY_PATH" />
+                <ScalarProperty Name="PATH_INDEX" ColumnName="PATH_INDEX" />
+                <ScalarProperty Name="ADDRESS_TYPE" ColumnName="ADDRESS_TYPE" />
+                <ScalarProperty Name="ADDRESS_CATEGORY" ColumnName="ADDRESS_CATEGORY" />
+                <ScalarProperty Name="NAME" ColumnName="NAME" />
+                <ScalarProperty Name="BALANCE" ColumnName="BALANCE" />
+                <ScalarProperty Name="ACCOUNT" ColumnName="ACCOUNT" />
+                <ScalarProperty Name="DESCRIPTION" ColumnName="DESCRIPTION" />
+                <ScalarProperty Name="CREATE_DATE" ColumnName="CREATE_DATE" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="BASE_WALLET">
             <EntityTypeMapping TypeName="WalletModel.BASE_WALLET">
               <MappingFragment StoreEntitySet="BASE_WALLET">
-                <ScalarProperty Name="CREATE_DATE" ColumnName="CREATE_DATE" />
-                <ScalarProperty Name="IS_ACTIVE" ColumnName="IS_ACTIVE" />
-                <ScalarProperty Name="DESCRIPTION" ColumnName="DESCRIPTION" />
-                <ScalarProperty Name="MNEMONIC_WORDS" ColumnName="MNEMONIC_WORDS" />
-                <ScalarProperty Name="PASSWORD" ColumnName="PASSWORD" />
-                <ScalarProperty Name="WALLET_NAME" ColumnName="WALLET_NAME" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="WALLET_NAME" ColumnName="WALLET_NAME" />
+                <ScalarProperty Name="PASSWORD" ColumnName="PASSWORD" />
+                <ScalarProperty Name="MNEMONIC_WORDS" ColumnName="MNEMONIC_WORDS" />
+                <ScalarProperty Name="DESCRIPTION" ColumnName="DESCRIPTION" />
+                <ScalarProperty Name="IS_ACTIVE" ColumnName="IS_ACTIVE" />
+                <ScalarProperty Name="CREATE_DATE" ColumnName="CREATE_DATE" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

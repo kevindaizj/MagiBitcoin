@@ -45,6 +45,7 @@ namespace USDTWallet.Biz.Wallet
             {
                 Id = Guid.NewGuid().ToString("N"),
                 Address = result.RootAddress,
+                ExtPubKeyWif = result.RootExtPubKeyWif,
                 WalletId = wallet.Id,
                 Network = result.Network,
                 KeyPath = null,

@@ -16,7 +16,7 @@ namespace USDTWallet.Common.Operators
             get { return _instance.Value; }
         }
 
-        private Network Network { get; set; }
+        public Network Network { get; set; }
 
         private KeyOperator(Network network)
         {
@@ -27,13 +27,24 @@ namespace USDTWallet.Common.Operators
         {
             var mnemonic = new Mnemonic(Wordlist.English, WordCount.TwentyFour);
             var rootKey = mnemonic.DeriveExtKey(password);
-            var rootAddress = rootKey.GetPublicKey().GetAddress(this.Network).ToString();
+            var rootPubKey = rootKey.Neuter();
+            var rootExtPubKeyWif = rootPubKey.GetWif(this.Network).ToWif();
+            var rootAddress = rootPubKey.GetPublicKey().GetAddress(this.Network).ToString();
             return new MnemonicResult
             {
                 Network = (this.Network == Network.Main) ? (int)NetworkType.Mainnet : (int)NetworkType.Testnet,
                 RootAddress = rootAddress,
+                RootExtPubKeyWif = rootExtPubKeyWif,
                 MnemonicWords = mnemonic.Words
             };
+        }
+
+        public string DeriveNewAddress(string rootExtPubKeyWif, KeyPath keyPath)
+        {
+            var rootExtPubKey = ExtPubKey.Parse(rootExtPubKeyWif, this.Network);
+            var key = rootExtPubKey.Derive(keyPath);
+            var address = key.GetPublicKey().GetAddress(this.Network).ToString();
+            return address;
         }
     }
 }

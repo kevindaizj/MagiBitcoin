@@ -39,6 +39,20 @@ namespace USDTWallet.Views.Home
             set { SetProperty(ref _rootAddress, value); }
         }
 
+        private bool _anyCompanyAddress;
+        public bool AnyCompanyAddress
+        {
+            get { return _anyCompanyAddress; }
+            set { SetProperty(ref _anyCompanyAddress, value); }
+        }
+
+        private bool _anyCustomerAddress;
+        public bool AnyCustomerAddress
+        {
+            get { return _anyCustomerAddress; }
+            set { SetProperty(ref _anyCustomerAddress, value); }
+        }
+
         public ObservableCollection<AddressVM> CompanyAddresses { get; set; }
         public ObservableCollection<AddressVM> CustomerAddresses { get; set; }
 
@@ -50,6 +64,8 @@ namespace USDTWallet.Views.Home
         private IEventAggregator EventAggregator { get; set; }
 
         public DelegateCommand<string> CreateAddressCommand { get; set; }
+
+        public InteractionRequest<INotification> CreateAddressPopupRequest { get; set; }
 
         public HomePageController(WalletManager walletManager, AddressManager addressManager, MessageBoxService msgBox, IEventAggregator eventAggregator)
         {
@@ -64,6 +80,9 @@ namespace USDTWallet.Views.Home
 
             this.EventAggregator.GetEvent<LoginSuccessEvent>().Subscribe(Initialize);
             this.CreateAddressCommand = new DelegateCommand<string>(CreateAddress);
+            this.CreateAddressPopupRequest = new InteractionRequest<INotification>();
+
+            EventAggregator.GetEvent<CreateAddressSuccessEvent>().Subscribe(AfterCreateAddress);
         }
         
 
@@ -75,17 +94,42 @@ namespace USDTWallet.Views.Home
             this.RootAddress = AddressManager.GetRootAddress(wallet.Id);
 
             var companyAddresses = AddressManager.GetRootAddressesByType(wallet.Id, CustomAddressType.Company);
+            this.AnyCompanyAddress = companyAddresses.Count() > 0;
             this.CompanyAddresses.Clear();
             this.CompanyAddresses.AddRange(companyAddresses);
 
             var customerAddresses = AddressManager.GetRootAddressesByType(wallet.Id, CustomAddressType.Customer);
+            this.AnyCustomerAddress = companyAddresses.Count() > 0;
             this.CustomerAddresses.Clear();
             this.CustomerAddresses.AddRange(customerAddresses);
         }
 
         private void CreateAddress(string type)
         {
-            //throw new NotImplementedException();
+            long addressType = long.Parse(type);
+            var title = "创建新公司地址";
+            if (addressType == (long)CustomAddressType.Customer)
+                title = "创建新客户地址";
+
+            CreateAddressPopupRequest.Raise(new Notification { Title = title, Content = addressType });
+        }
+
+        private void AfterCreateAddress(long addressType)
+        {
+            var wallet = WalletManager.GetActiveWallet();
+            var addresses = AddressManager.GetRootAddressesByType(wallet.Id, (CustomAddressType)addressType);
+            if(addressType == (long)CustomAddressType.Company)
+            {
+                this.AnyCompanyAddress = addresses.Count() > 0;
+                CompanyAddresses.Clear();
+                CompanyAddresses.AddRange(addresses);
+            }
+            else
+            {
+                this.AnyCustomerAddress = addresses.Count() > 0;
+                CustomerAddresses.Clear();
+                CustomerAddresses.AddRange(addresses);
+            }
         }
     }
 }

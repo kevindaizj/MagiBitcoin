@@ -8,4 +8,6 @@ using System.Threading.Tasks;
 namespace USDTWallet.Events
 {
     public class LoginSuccessEvent : PubSubEvent {}
+
+    public class CreateAddressSuccessEvent : PubSubEvent<long> { }
 }
