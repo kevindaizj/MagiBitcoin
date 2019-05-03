@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace USDTWallet.Models.Enums.Network
 {
-    public enum NetworkType
+    public enum CustomNetworkType
     {
-        Mainnet = 1,
-        Testnet = 2
+        Mainnet = 0,
+        Testnet = 1,
+        Regtest = 2
     }
 }

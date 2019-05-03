@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using USDTWallet.Models.Enums.Network;
 
 namespace USDTWallet.Common.Operators
 {
@@ -15,14 +16,15 @@ namespace USDTWallet.Common.Operators
         {
             get { return _instance.Value; }
         }
-        
+
         public Network Network { get; private set; }
 
         public Uri RpcUri { get; private set; }
+        
 
         public NetworkCredential Credential { get; private set; }
 
-        private NetworkOperator(NetworkType networkType = NetworkType.Regtest, 
+        private NetworkOperator(CustomNetworkType networkType = CustomNetworkType.Regtest, 
                                 string rpcUrl = "http://localhost:8339",
                                 string rpcUserName = "kevin", 
                                 string rpcPassword = "123456")
@@ -30,23 +32,40 @@ namespace USDTWallet.Common.Operators
             this.Init(networkType, rpcUrl, rpcUserName, rpcPassword);
         }
 
-        private void Init(NetworkType networkType, string rpcUrl, string rpcUserName, string rpcPassword)
+        private void Init(CustomNetworkType networkType, string rpcUrl, string rpcUserName, string rpcPassword)
         {
-            if (networkType == NetworkType.Mainnet)
+            if (networkType == CustomNetworkType.Mainnet)
                 this.Network = Network.Main;
-            if (networkType == NetworkType.Testnet)
+            if (networkType == CustomNetworkType.Testnet)
                 this.Network = Network.TestNet;
-            if (networkType == NetworkType.Regtest)
+            if (networkType == CustomNetworkType.Regtest)
                 this.Network = Network.RegTest;
 
             this.Credential = new NetworkCredential(rpcUserName, rpcPassword);
             this.RpcUri = new Uri(rpcUrl);
         }
 
-        public void ChangeNetwork(NetworkType networkType, string rpcUrl, string rpcUserName, string rpcPassword)
+        public void ChangeNetwork(CustomNetworkType networkType, string rpcUrl, string rpcUserName, string rpcPassword)
         {
             this.Init(networkType, rpcUrl, rpcUserName, rpcPassword);
             BTCOperator.Instance.ChangeNetwork(Credential, RpcUri, Network);
+        }
+
+        public async Task<bool> CheckNetwork()
+        {
+            bool connected = false;
+
+            try
+            {
+                await BTCOperator.Instance.GetBalance();
+                connected = true;
+            }
+            catch(Exception ex)
+            {
+
+            }
+
+            return connected;
         }
     }
 }

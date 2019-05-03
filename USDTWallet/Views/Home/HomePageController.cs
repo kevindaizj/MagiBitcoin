@@ -12,6 +12,7 @@ using USDTWallet.Biz.Accounts;
 using USDTWallet.Biz.Addresses;
 using USDTWallet.Biz.Wallet;
 using USDTWallet.Common;
+using USDTWallet.Common.Operators;
 using USDTWallet.ControlService.MsgBox;
 using USDTWallet.Events;
 using USDTWallet.Models.Enums.Address;

@@ -10,4 +10,6 @@ namespace USDTWallet.Events
     public class LoginSuccessEvent : PubSubEvent {}
 
     public class CreateAddressSuccessEvent : PubSubEvent<long> { }
+
+    public class ChangeNetworkEvent: PubSubEvent { }
 }

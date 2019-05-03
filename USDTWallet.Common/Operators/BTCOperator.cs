@@ -37,6 +37,12 @@ namespace USDTWallet.Common.Operators
             return Client.ListAddressGroupings().ToList();
         }
 
+        public async Task<Money> GetBalance()
+        {
+            var balance = await Client.GetBalanceAsync();
+            return balance;
+        }
+
 
     }
 }

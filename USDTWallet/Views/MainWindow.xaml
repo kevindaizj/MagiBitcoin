@@ -7,6 +7,7 @@
         xmlns:local="clr-namespace:USDTWallet.Views"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:popup="clr-namespace:USDTWallet.Views.Popups.Wallets"
+        xmlns:networkPopup="clr-namespace:USDTWallet.Views.Popups.Networks"
         prism:ViewModelLocator.AutoWireViewModel="True"
         mc:Ignorable="d"
         Title="USDT Wallet" Height="620" Width="1236" MinWidth="940" WindowStartupLocation="CenterScreen">
@@ -35,7 +36,7 @@
             </MenuItem>
 
             <MenuItem Header="网络">
-                <MenuItem Header="切换网络" InputGestureText="Ctrl + N" />
+                <MenuItem Header="切换网络" Command="{Binding ChangeNetworkCommand}" InputGestureText="Ctrl + N" />
             </MenuItem>
 
             <MenuItem Header="语言">
@@ -48,7 +49,7 @@
             </MenuItem>
         </Menu>
 
-        <StackPanel Grid.Row="1" HorizontalAlignment="Right" Background="#00D55F" Panel.ZIndex="1000" Height="30" Margin="0 0 20 -60" >
+        <StackPanel Grid.Row="1" HorizontalAlignment="Right" Background="{Binding NetworkTagBg}" Panel.ZIndex="1000" Height="30" Margin="0 0 20 -60" >
             <ContentControl Foreground="#FFF" FontSize="14" VerticalAlignment="Center">
                 <TextBlock Text="{Binding Network}" Padding="10 5 10 0" VerticalAlignment="Center" />
             </ContentControl>
@@ -84,7 +85,18 @@
                 </prism:PopupWindowAction.WindowStyle>
             </prism:PopupWindowAction>
         </prism:InteractionRequestTrigger>
-        
+
+        <prism:InteractionRequestTrigger SourceObject="{Binding ChangeNetworkPopupRequest}">
+            <prism:PopupWindowAction IsModal="True" CenterOverAssociatedObject="True"  WindowContentType="{x:Type networkPopup:ChangeNetwork}" WindowStartupLocation="CenterScreen">
+                <prism:PopupWindowAction.WindowStyle>
+                    <Style TargetType="{x:Type Window}">
+                        <Setter Property="ResizeMode" Value="NoResize"/>
+                        <Setter Property="SizeToContent" Value="WidthAndHeight"/>
+                    </Style>
+                </prism:PopupWindowAction.WindowStyle>
+            </prism:PopupWindowAction>
+        </prism:InteractionRequestTrigger>
+
     </i:Interaction.Triggers>
     
 
