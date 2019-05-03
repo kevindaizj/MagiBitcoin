@@ -1,9 +1,11 @@
-﻿using System;
+﻿using NBitcoin.DataEncoders;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using USDTWallet.Biz.Common;
+using USDTWallet.Common.Gloabal;
 using USDTWallet.Common.Helpers;
 using USDTWallet.Common.Operators;
 using USDTWallet.Dao.Address;
@@ -34,13 +36,15 @@ namespace USDTWallet.Biz.Wallet
         public MnemonicResult CreateWallet(string password)
         {
             var result = KeyOperator.Instance.CreateMnemonicRoot(password);
+            var mnemonic = string.Join(" ", result.MnemonicWords);
             var wallet = new WalletInfo
             {
                 Id = Guid.NewGuid().ToString("N"),
                 WalletName = "Wallet_" + DateTime.Now.ToString("yyyyMMddHHmm"),
                 Password = MD5Helper.ToMD5(password),
-                MnemonicWords = string.Join(" ", result.MnemonicWords)
+                MnemonicWords = CryptHelper.AESEncryptText(mnemonic, password)
             };
+
             var rootAddress = new AddressInfo
             {
                 Id = Guid.NewGuid().ToString("N"),
@@ -57,6 +61,14 @@ namespace USDTWallet.Biz.Wallet
             WalletDao.Create(wallet);
             AddressDao.Create(rootAddress);
 
+            GlobalWallet.Set(new ActiveWallet
+            {
+                Id = wallet.Id,
+                Name = wallet.WalletName,
+                RootXPrivKey = result.RootExtPrivKeyWif,
+                RootXPubKey = result.RootExtPubKeyWif
+            });
+
             return result;
         }
 
@@ -70,6 +82,18 @@ namespace USDTWallet.Biz.Wallet
             var wallet = WalletDao.GetActiveWallet();
             if (MD5Helper.ToMD5(pwd) != wallet.Password)
                 return false;
+
+            var mnemonicWords = CryptHelper.AESDecryptText(wallet.MnemonicWords, pwd);
+            var result = KeyOperator.Instance.Recover(pwd, mnemonicWords);
+
+            GlobalWallet.Set(new ActiveWallet
+            {
+                Id = wallet.Id,
+                Name = wallet.WalletName,
+                RootXPrivKey = result.RootExtPrivKeyWif,
+                RootXPubKey = result.RootExtPubKeyWif
+            });
+
             return true;
         }
     }

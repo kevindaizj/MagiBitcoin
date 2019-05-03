@@ -5,8 +5,8 @@
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
       <Diagram DiagramId="c926bb5d4202458db5e9582b81e0d9ee" Name="Diagram1">
-        <EntityTypeShape EntityType="WalletModel.BASE_ADDRESS" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="WalletModel.BASE_WALLET" Width="1.5" PointX="2.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="WalletModel.BASE_ADDRESS" Width="1.5" PointX="0.75" PointY="0.75" />
+        <EntityTypeShape EntityType="WalletModel.BASE_WALLET" Width="1.5" PointX="2.75" PointY="0.75" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

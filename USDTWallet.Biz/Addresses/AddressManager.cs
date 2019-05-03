@@ -21,9 +21,9 @@ namespace USDTWallet.Biz.Addresses
             this.AddressDao = addressDao;
         }
 
-        public AddressVM GetRootAddress(string walletId)
+        public AddressVM GetRootAddress()
         {
-            var addressInfo = AddressDao.GetRootAddress(walletId);
+            var addressInfo = AddressDao.GetRootAddress(CurrentWallet.Id);
             return new AddressVM
             {
                 Address = addressInfo.Address,
@@ -37,9 +37,9 @@ namespace USDTWallet.Biz.Addresses
             };
         }
 
-        public List<AddressVM> GetRootAddressesByType(string walletId, CustomAddressType type)
+        public List<AddressVM> GetRootAddressesByType(CustomAddressType type)
         {
-            var addresses = AddressDao.GetRootAddressesByType(walletId, (long)type);
+            var addresses = AddressDao.GetAddressesByType(CurrentWallet.Id, (long)type);
             var results = new List<AddressVM>();
 
             foreach(var a in addresses)
@@ -63,34 +63,70 @@ namespace USDTWallet.Biz.Addresses
         /// <summary>
         /// Create new non-root address
         /// </summary>
-        public void CreateNewAddress(string walletId, long type, long category, string name, string account)
+        public void CreateCompanyAddress(long addressCategory, string name, string account)
         {
-            var rootAddress = AddressDao.GetRootAddress(walletId);
-            var parentKeyPath = new KeyPath($"/{type}/{category}");
-            long maxIndex = AddressDao.GetMaxPathIndex(walletId, parentKeyPath.ToString());
+            long addressType = (long)CustomAddressType.Company;
+            var rootXPrivKey = ExtKey.Parse(CurrentWallet.RootXPrivKey);
+
+            var parentKeyPath = new KeyPath($"/{addressType}'/{addressCategory}'");
+            long maxIndex = AddressDao.GetMaxPathIndex(CurrentWallet.Id, parentKeyPath.ToString());
             long currentIndex = maxIndex + 1;
 
             var keyPath = parentKeyPath.Derive((uint)currentIndex);
-            var address = KeyOperator.Instance.DeriveNewAddress(rootAddress.ExtPubKeyWif, keyPath);
+            var address = KeyOperator.Instance.DeriveNewAddress(rootXPrivKey, keyPath);
 
             var addressInfo = new AddressInfo
             {
                 Id = Guid.NewGuid().ToString("N"),
                 Address = address,
                 ExtPubKeyWif = null,
-                WalletId = walletId,
-                Network = (KeyOperator.Instance.Network == Network.Main) ? (int)NetworkType.Mainnet : (int)NetworkType.Testnet,
+                WalletId = CurrentWallet.Id,
+                Network = (NetworkOperator.Instance.Network == Network.Main) ? (int)NetworkType.Mainnet : (int)NetworkType.Testnet,
                 KeyPath = keyPath.ToString(),
                 ParentKeyPath = parentKeyPath.ToString(),
                 PathIndex = currentIndex,
-                AddressType = type,
-                AddressCategory = category,
-                Name = name,
+                AddressType = addressType,
+                AddressCategory = addressCategory,
+                Name = (addressCategory == (long)AddressCategory.Receiver ? "收款" : "付款") + " " + currentIndex,
                 Account = account
             };
 
             AddressDao.Create(addressInfo);
 
+        }
+
+
+        public List<string> CreateCustomerAddresses(int count)
+        {
+            var customerId = AddressDao.GetMaxCustomerId(CurrentWallet.Id);
+
+            var rootXPrivKey = ExtKey.Parse(CurrentWallet.RootXPrivKey);
+
+            var addresses = new List<AddressInfo>();
+
+            for(int i = 0; i < count; i++)
+            {
+                ++customerId;
+                var keyPath = new KeyPath($"/{(int)CustomAddressType.Customer}'/{customerId}'");
+                var address = KeyOperator.Instance.DeriveNewAddress(rootXPrivKey, keyPath);
+                addresses.Add(new AddressInfo
+                {
+                    Id = Guid.NewGuid().ToString("N"),
+                    Address = address,
+                    WalletId = CurrentWallet.Id,
+                    Network = (NetworkOperator.Instance.Network == Network.Main) ? (int)NetworkType.Mainnet : (int)NetworkType.Testnet,
+                    KeyPath = keyPath.ToString(),
+                    CustomerId = customerId,
+                    PathIndex = customerId,
+                    AddressType = (long)CustomAddressType.Customer,
+                    AddressCategory = (long)AddressCategory.Receiver, 
+                    Name = "客户" + customerId + "--充币"
+                });
+            }
+            
+            AddressDao.BatchCreate(addresses);
+
+            return addresses.Select(o => o.Address).ToList();
         }
     }
 }

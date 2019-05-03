@@ -104,6 +104,7 @@
     <Compile Include="Behaviors\PasswordBoxBehavior.cs" />
     <Compile Include="Common\ControllerBase.cs" />
     <Compile Include="Common\DispatcherHelper.cs" />
+    <Compile Include="ControlService\Clipb\ClipboardService.cs" />
     <Compile Include="ControlService\MsgBox\MessageBoxService.cs" />
     <Compile Include="Events\UIEvents.cs" />
     <Compile Include="PopupNotifications\WalletInitNotification.cs" />

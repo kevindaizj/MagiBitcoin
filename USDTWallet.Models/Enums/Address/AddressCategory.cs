@@ -19,6 +19,6 @@ namespace USDTWallet.Models.Enums.Address
         /// <summary>
         /// 收款地址
         /// </summary>
-        Receiver = 2
+        Receiver = 2,
     }
 }

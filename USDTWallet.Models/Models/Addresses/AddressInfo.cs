@@ -22,6 +22,6 @@ namespace USDTWallet.Models.Models.Addresses
         public double Balance { get; set; }
         public string Account { get; set; }
         public string Description { get; set; }
-
+        public long? CustomerId { get; set; }
     }
 }

@@ -53,7 +53,8 @@ namespace USDTWallet.Dao.Wallet
                                 Id = w.ID,
                                 WalletName = w.WALLET_NAME,
                                 Description = w.DESCRIPTION,
-                                Password = w.PASSWORD
+                                Password = w.PASSWORD,
+                                MnemonicWords = w.MNEMONIC_WORDS
                             };
 
                 return query.SingleOrDefault();

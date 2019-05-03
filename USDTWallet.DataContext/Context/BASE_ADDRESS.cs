@@ -23,6 +23,7 @@ namespace USDTWallet.DataContext.Context
         public string PARENT_KEY_PATH { get; set; }
         public long PATH_INDEX { get; set; }
         public long ADDRESS_TYPE { get; set; }
+        public Nullable<long> CUSTOMER_ID { get; set; }
         public long ADDRESS_CATEGORY { get; set; }
         public string NAME { get; set; }
         public double BALANCE { get; set; }

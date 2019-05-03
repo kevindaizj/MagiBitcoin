@@ -56,8 +56,7 @@ namespace USDTWallet.Views.Home
         public ObservableCollection<AddressVM> CompanyAddresses { get; set; }
         public ObservableCollection<AddressVM> CustomerAddresses { get; set; }
 
-
-        public WalletManager WalletManager { get; set; }
+        
         public AddressManager AddressManager { get; set; }
         private MessageBoxService MsgBox { get; set; }
 
@@ -67,9 +66,8 @@ namespace USDTWallet.Views.Home
 
         public InteractionRequest<INotification> CreateAddressPopupRequest { get; set; }
 
-        public HomePageController(WalletManager walletManager, AddressManager addressManager, MessageBoxService msgBox, IEventAggregator eventAggregator)
+        public HomePageController(AddressManager addressManager, MessageBoxService msgBox, IEventAggregator eventAggregator)
         {
-            this.WalletManager = walletManager;
             this.AddressManager = addressManager;
             this.MsgBox = msgBox;
             this.EventAggregator = eventAggregator;
@@ -89,16 +87,15 @@ namespace USDTWallet.Views.Home
         private void Initialize()
         {
             this.Ready = true;
+            
+            this.RootAddress = AddressManager.GetRootAddress();
 
-            var wallet = WalletManager.GetActiveWallet();
-            this.RootAddress = AddressManager.GetRootAddress(wallet.Id);
-
-            var companyAddresses = AddressManager.GetRootAddressesByType(wallet.Id, CustomAddressType.Company);
+            var companyAddresses = AddressManager.GetRootAddressesByType(CustomAddressType.Company);
             this.AnyCompanyAddress = companyAddresses.Count() > 0;
             this.CompanyAddresses.Clear();
             this.CompanyAddresses.AddRange(companyAddresses);
 
-            var customerAddresses = AddressManager.GetRootAddressesByType(wallet.Id, CustomAddressType.Customer);
+            var customerAddresses = AddressManager.GetRootAddressesByType(CustomAddressType.Customer);
             this.AnyCustomerAddress = companyAddresses.Count() > 0;
             this.CustomerAddresses.Clear();
             this.CustomerAddresses.AddRange(customerAddresses);
@@ -116,8 +113,7 @@ namespace USDTWallet.Views.Home
 
         private void AfterCreateAddress(long addressType)
         {
-            var wallet = WalletManager.GetActiveWallet();
-            var addresses = AddressManager.GetRootAddressesByType(wallet.Id, (CustomAddressType)addressType);
+            var addresses = AddressManager.GetRootAddressesByType((CustomAddressType)addressType);
             if(addressType == (long)CustomAddressType.Company)
             {
                 this.AnyCompanyAddress = addresses.Count() > 0;

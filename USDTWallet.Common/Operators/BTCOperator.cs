@@ -11,33 +11,24 @@ namespace USDTWallet.Common.Operators
 {
     public class BTCOperator
     {
-        private static Lazy<BTCOperator> _instance = new Lazy<BTCOperator>(() => new BTCOperator(Network.RegTest));
-        public BTCOperator Instance
+        private static Lazy<BTCOperator> _instance = new Lazy<BTCOperator>(() => new BTCOperator());
+        public static BTCOperator Instance
         {
             get { return _instance.Value; }
         }
-
-        private Uri RpcUri { get; set; }
-
-        private NetworkCredential Credential { get; set; }
-
+        
         private RPCClient Client { get; set; }
-
-
-        private BTCOperator(Network network, string rpcUrl = "http://localhost:8339", 
-                            string rpcUserName = "kevin", string rpcPwd = "123456")
+        
+        private BTCOperator()
         {
-            this.Credential = new NetworkCredential(rpcUserName, rpcPwd);
-            this.RpcUri = new Uri(rpcUrl);
-            this.Client = new RPCClient(Credential, RpcUri, network);
+            this.ChangeNetwork(NetworkOperator.Instance.Credential, 
+                               NetworkOperator.Instance.RpcUri,
+                               NetworkOperator.Instance.Network);
         }
 
-        public void ChangeNetwork(Network network, string rpcUrl, string rpcUserName, string rpcPwd)
+        public void ChangeNetwork(NetworkCredential credential, Uri rpcUri, Network network)
         {
-            if (string.IsNullOrWhiteSpace(rpcUrl))
-                throw new ArgumentNullException("RPC Url cannot be null");
-
-            _instance = new Lazy<BTCOperator>(() => new BTCOperator(network, rpcUrl, rpcUserName, rpcPwd));
+            this.Client = new RPCClient(credential, rpcUri, network);
         }
 
 
