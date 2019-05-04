@@ -148,7 +148,9 @@
     <Compile Include="StartupConfigs\ServiceRegisterConfig.cs" />
     <Compile Include="StartupConfigs\ViewControllerLocatorConfig.cs" />
     <Compile Include="StartupConfigs\ViewRegionConfig.cs" />
+    <Compile Include="ValueConverters\FeeRateConverter.cs" />
     <Compile Include="ValueConverters\InverseBooleanConverter.cs" />
+    <Compile Include="ValueConverters\MoneyConverter.cs" />
     <Compile Include="ValueConverters\NullOrEmptyConverter.cs" />
     <Compile Include="ValueConverters\NullToBooleanConverter.cs" />
     <Compile Include="ValueConverters\PipedValueConverterGroup.cs" />

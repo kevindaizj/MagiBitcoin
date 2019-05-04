@@ -74,6 +74,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Gloabal\GlobalWallet.cs" />
+    <Compile Include="Helpers\AddressHelper.cs" />
     <Compile Include="Helpers\CryptHelper.cs" />
     <Compile Include="Helpers\DataDirectoryHelper.cs" />
     <Compile Include="Helpers\MD5Helper.cs" />

@@ -94,8 +94,7 @@ namespace USDTWallet.Biz.Addresses
             AddressDao.Create(addressInfo);
 
         }
-
-
+        
         public List<string> CreateCustomerAddresses(int count)
         {
             var customerId = AddressDao.GetMaxCustomerId(CurrentWallet.Id);
@@ -127,6 +126,12 @@ namespace USDTWallet.Biz.Addresses
             AddressDao.BatchCreate(addresses);
 
             return addresses.Select(o => o.Address).ToList();
+        }
+        
+        public async Task<Money> GetBalance(string address)
+        {
+            var balance = await BTCOperator.Instance.GetBalanceByAddress(address);
+            return balance;
         }
     }
 }

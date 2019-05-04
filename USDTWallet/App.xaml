@@ -15,7 +15,15 @@
                 <converter:InverseBooleanConverter />
                 <BooleanToVisibilityConverter />
             </converter:PipedValueConverterGroup>
+
+            <converter:MoneyConverter x:Key="MoneyConverter" />
+            <converter:FeeRateConverter x:Key="FeeRateConverter" />
             <converter:NullOrEmptyConverter x:Key="NullOrEmptyConverter" />
+
+            <converter:PipedValueConverterGroup x:Key="MoneyEmptyConverter" >
+                <converter:MoneyConverter />
+                <converter:NullOrEmptyConverter />
+            </converter:PipedValueConverterGroup>
 
             <converter:PipedValueConverterGroup x:Key="NullBoolToVisibility" >
                 <converter:NullToBooleanConverter />

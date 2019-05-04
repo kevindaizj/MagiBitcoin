@@ -43,6 +43,26 @@ namespace USDTWallet.Common.Operators
             return balance;
         }
 
+        public async Task<Money> GetBalanceByAddress(string address)
+        {
+            var addr = BitcoinAddress.Create(address, NetworkOperator.Instance.Network);
+            var unspentList = await Client.ListUnspentAsync(0, int.MaxValue, addr);
+            return unspentList.Select(o => o.Amount).Sum();
+        }
 
+        public async Task<FeeRate> EstimateFeeRate()
+        {
+            try
+            {
+                var result = await Client.EstimateSmartFeeAsync(1);
+                var feeRate = result.FeeRate;
+                return feeRate;
+            }
+            catch(NoEstimationException)
+            {
+                return new FeeRate((decimal)0);
+            }
+            
+        }
     }
 }
