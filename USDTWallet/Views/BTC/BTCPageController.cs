@@ -1,5 +1,6 @@
 ﻿using Prism.Commands;
 using Prism.Events;
+using Prism.Interactivity.InteractionRequest;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,7 @@ using USDTWallet.Common.Helpers;
 using USDTWallet.Common.Operators;
 using USDTWallet.ControlService.MsgBox;
 using USDTWallet.Models.Models.Transfer;
+using USDTWallet.PopupNotifications;
 
 namespace USDTWallet.Views.BTC
 {
@@ -34,6 +36,13 @@ namespace USDTWallet.Views.BTC
             set { this.SetProperty(ref _btnContent, value); }
         }
 
+        private string _signbtnContent = "签署";
+        public string SignBtnContent
+        {
+            get { return _signbtnContent; }
+            set { this.SetProperty(ref _signbtnContent, value); }
+        }
+
 
         private BTCTransferVM _transferInfo;
         public BTCTransferVM TransferInfo
@@ -42,9 +51,20 @@ namespace USDTWallet.Views.BTC
             set { this.SetProperty(ref _transferInfo, value); }
         }
 
+        private string _unsignedTxHex;
+        public string UnsignedTxHex
+        {
+            get { return _unsignedTxHex; }
+            set { SetProperty(ref _unsignedTxHex, value); }
+        }
+
         public DelegateCommand EstimateFeeRateCommand { get; set; }
         
         public DelegateCommand GenerateTransactionCommand { get; set; }
+        public InteractionRequest<GenBTCTxNotification> GenTransactionPopupRequest { get; set; }
+
+        public DelegateCommand SignTransactionCommand { get; set; }
+        public InteractionRequest<INotification> SignTransactionPopupRequest { get; set; }
 
         public DelegateCommand OnFromAddressChanged { get; set; }
 
@@ -63,19 +83,40 @@ namespace USDTWallet.Views.BTC
 
             this.OnFromAddressChanged = new DelegateCommand(async () => await GetBalance());
             this.GenerateTransactionCommand = new DelegateCommand(GenerateUnsignedTransaction);
+            this.GenTransactionPopupRequest = new InteractionRequest<GenBTCTxNotification>();
+
+            this.SignTransactionCommand = new DelegateCommand(SignTransaction);
+            this.SignTransactionPopupRequest = new InteractionRequest<INotification>();
+
             this.EstimateFeeRateCommand = new DelegateCommand(EstimateFeeRate);
         }
         
-
         private void GenerateUnsignedTransaction()
         {
             this.TransferInfo.TriggerValidation();
             if (this.TransferInfo.HasErrors)
                 return;
 
-            //this.BtnContent = "Sending...";
-            //ConfirmTransactionPopupRequest.Raise(new ConfirmTxNotification { Title = "确认", Transaction = TransferInfo });
-            //this.BtnContent = "Send";
+            this.BtnContent = "生成中...";
+            GenTransactionPopupRequest.Raise(new GenBTCTxNotification { Title = "BTC交易 (未签名)", TransferInfo = TransferInfo });
+            this.BtnContent = "生成交易";
+        }
+
+        private void SignTransaction()
+        {
+            if (string.IsNullOrEmpty(this.UnsignedTxHex))
+                return;
+
+            bool valid = BTCOperator.Instance.CheckTx(this.UnsignedTxHex);
+            if (!valid)
+            {
+                this.MessageBoxService.Show("交易Hex不正确，请确认");
+                return;
+            }
+
+            this.SignBtnContent = "签署中...";
+            SignTransactionPopupRequest.Raise(new Notification { Title = "签署", Content = this.UnsignedTxHex });
+            this.SignBtnContent = "签署";
         }
 
         private async Task GetBalance()

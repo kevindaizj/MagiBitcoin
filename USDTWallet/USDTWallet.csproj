@@ -154,6 +154,7 @@
     <Compile Include="ControlService\MsgBox\MessageBoxService.cs" />
     <Compile Include="ControlService\Toast\ToastService.cs" />
     <Compile Include="Events\UIEvents.cs" />
+    <Compile Include="PopupNotifications\GenBTCTxNotification.cs" />
     <Compile Include="PopupNotifications\WalletInitNotification.cs" />
     <Compile Include="StartupConfigs\ExceptionConfig.cs" />
     <Compile Include="StartupConfigs\PrerequisiteDataDirectoryConfig.cs" />
@@ -190,6 +191,14 @@
       <DependentUpon>ChangeNetwork.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Popups\Networks\ChangeNetworkController.cs" />
+    <Compile Include="Views\Popups\Transactions\GenBTCTransaction.xaml.cs">
+      <DependentUpon>GenBTCTransaction.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Popups\Transactions\GenBTCTransactionController.cs" />
+    <Compile Include="Views\Popups\Transactions\SignBTCTransaction.xaml.cs">
+      <DependentUpon>SignBTCTransaction.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Popups\Transactions\SignBTCTransactionController.cs" />
     <Compile Include="Views\Popups\Wallets\CreateWallet.xaml.cs">
       <DependentUpon>CreateWallet.xaml</DependentUpon>
     </Compile>
@@ -231,6 +240,14 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\Popups\Networks\ChangeNetwork.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Popups\Transactions\GenBTCTransaction.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Popups\Transactions\SignBTCTransaction.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

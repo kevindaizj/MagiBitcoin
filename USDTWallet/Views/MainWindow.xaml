@@ -10,7 +10,7 @@
         xmlns:networkPopup="clr-namespace:USDTWallet.Views.Popups.Networks"
         prism:ViewModelLocator.AutoWireViewModel="True"
         mc:Ignorable="d"
-        Title="USDT Wallet" Height="620" Width="1236" MinWidth="940" WindowStartupLocation="CenterScreen">
+        Title="USDT Wallet" Height="760" Width="1236" MinWidth="940" WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

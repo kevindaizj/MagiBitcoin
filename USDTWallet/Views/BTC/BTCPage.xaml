@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:prism="http://prismlibrary.com/"       
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:popup ="clr-namespace:USDTWallet.Views.Popups.Transactions"
              prism:ViewModelLocator.AutoWireViewModel="True"
              mc:Ignorable="d" 
              d:DesignHeight="1450" d:DesignWidth="800">
@@ -67,7 +68,7 @@
                                 <TextBox Margin="0 10 0 10" FontSize="19" Style="{StaticResource TransferTextBoxStyle}" Text="{Binding TransferInfo.Amount, StringFormat={}{0.0}, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource MoneyConverter} }" PreviewTextInput="TextBox_PreviewTextInput"/>
                             </StackPanel>
                             <StackPanel Margin="10 0 30 0" Grid.Column="1">
-                                <TextBlock Foreground="#858585" FontSize="14" Text="手续费:" />
+                                <TextBlock Foreground="#858585" FontSize="14" Text="手续费率 （BTC/KB）:" />
                                 <DockPanel>
                                     <Button DockPanel.Dock="Right" Style="{StaticResource TransferSideBtnStyle}" Content="{Binding EstFeeBtnContent}" Command="{Binding EstimateFeeRateCommand}" />
                                     <TextBox Margin="0 10 0 10" FontSize="19" Style="{StaticResource TransferTextBoxStyle}" 
@@ -106,7 +107,51 @@
 
                     </StackPanel>
                 </Border>
+
+
+
+                <TextBlock FontSize="20" Margin="0 10 0 0" Foreground="#333333"><Run Text="签署BTC交易"/></TextBlock>
+                <Border Background="#FFF" CornerRadius="10" Margin="0 17 0 100" Padding="36 37">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="50" Color="#EEEEEE" ShadowDepth="0" />
+                    </Border.Effect>
+
+                    <StackPanel>
+                        <Grid>
+                            <StackPanel Margin="10 10 30 0" Grid.Column="0">
+                                <TextBlock Foreground="#858585" FontSize="14" Text="交易Hex" />
+                                <TextBox Margin="0 10 0 10" FontSize="15" Height="100"  Style="{StaticResource TransferTextBoxStyle}" 
+                                         VerticalContentAlignment="Top" TextWrapping="Wrap" Text="{Binding UnsignedTxHex }">
+                                </TextBox>
+                            </StackPanel>
+                        </Grid>
+
+                        <StackPanel Margin="0 15 0 0">
+                            <Button Command="{Binding SignTransactionCommand}" Style="{StaticResource TransferBtnStyle }" 
+                                    HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="10">
+                                <Button.Content>
+                                    <TextBlock TextAlignment="Center" VerticalAlignment="Center" Text="{Binding SignBtnContent}"></TextBlock>
+                                </Button.Content>
+                            </Button>
+                        </StackPanel>
+
+                    </StackPanel>
+                </Border>
+
             </StackPanel>
         </ScrollViewer>
     </Grid>
+
+    <!-- Popup Triggers -->
+    <i:Interaction.Triggers>
+        <prism:InteractionRequestTrigger SourceObject="{Binding GenTransactionPopupRequest}">
+            <prism:PopupWindowAction IsModal="True" CenterOverAssociatedObject="True" WindowContentType="{x:Type popup:GenBTCTransaction}">
+            </prism:PopupWindowAction>
+        </prism:InteractionRequestTrigger>
+        <prism:InteractionRequestTrigger SourceObject="{Binding SignTransactionPopupRequest}">
+            <prism:PopupWindowAction IsModal="True" CenterOverAssociatedObject="True" WindowContentType="{x:Type popup:SignBTCTransaction}">
+            </prism:PopupWindowAction>
+        </prism:InteractionRequestTrigger>
+    </i:Interaction.Triggers>
+    
 </UserControl>
