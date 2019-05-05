@@ -30,7 +30,7 @@
                 <MenuItem Header="新建账户" InputGestureText="Ctrl + N" />
                 <MenuItem Header="导入账户" InputGestureText="Ctrl + I" />
                 <MenuItem Header="打开数据库目录" Command="{Binding OpenDatabaseDirCommand}" />
-                <MenuItem Header="打开日志"  />
+                <MenuItem Header="打开日志" Command="{Binding OpenLogDirCommand}" />
                 <Separator/>
                 <MenuItem Header="备份" />
             </MenuItem>

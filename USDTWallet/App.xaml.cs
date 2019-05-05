@@ -8,6 +8,7 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using USDTWallet.Common.Loggers;
 using USDTWallet.StartupConfigs;
 using USDTWallet.Views;
 
@@ -20,6 +21,9 @@ namespace USDTWallet
     {
         protected override void OnStartup(StartupEventArgs e)
         {
+
+            Logger.Instance.Config();
+            ExceptionConfig.Config();
             PrerequisiteDataDirectoryConfig.Config();
             base.OnStartup(e);
         }

@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using USDTWallet.ControlService.Clipb;
 using USDTWallet.ControlService.MsgBox;
+using USDTWallet.ControlService.Toast;
 
 namespace USDTWallet.StartupConfigs
 {
@@ -16,6 +17,7 @@ namespace USDTWallet.StartupConfigs
         {
             containerRegistry.RegisterSingleton<MessageBoxService>();
             containerRegistry.RegisterSingleton<ClipboardService>();
+            containerRegistry.RegisterSingleton<ToastService>();
             Load(containerRegistry);
         }
 

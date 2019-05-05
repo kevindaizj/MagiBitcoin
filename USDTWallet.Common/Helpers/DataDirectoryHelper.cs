@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using USDTWallet.Common.Loggers;
 
 namespace USDTWallet.Common.Helpers
 {
@@ -44,7 +45,7 @@ namespace USDTWallet.Common.Helpers
             var db = new FileInfo(sourceDbPath);
             if (!db.Exists)
             {
-                //Logger.Instance.Error("Source DB does not exist.");
+                Logger.Instance.Error("Source DB does not exist.");
                 return;
             }
 

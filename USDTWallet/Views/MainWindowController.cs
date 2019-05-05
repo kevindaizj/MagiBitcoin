@@ -27,6 +27,7 @@ namespace USDTWallet.Views
         public DelegateCommand OnLoadCommand { get; set; }
 
         public DelegateCommand OpenDatabaseDirCommand { get; set; }
+        public DelegateCommand OpenLogDirCommand { get; set; }
 
         public DelegateCommand ChangeNetworkCommand { get; set; }
 
@@ -86,13 +87,13 @@ namespace USDTWallet.Views
             this.ChangeNetworkPopupRequest = new InteractionRequest<INotification>();
             this.OnLoadCommand = new DelegateCommand(OnLoadHandler);
             this.OpenDatabaseDirCommand = new DelegateCommand(OpenDatabaseDirectory);
+            this.OpenLogDirCommand = new DelegateCommand(OpenLogDirectory);
             this.ChangeNetworkCommand = new DelegateCommand(this.OpenChangeNetworkPopup);
             this.WalletManager = walletManager;
             this.EventAggregator = eventAggregator;
             this.EventAggregator.GetEvent<ChangeNetworkEvent>().Subscribe(() => this.ChangeNetwork());
         }
-
-
+        
         private void OnLoadHandler()
         {
             bool hasWallet = WalletManager.CheckAnyWalletExisted();
@@ -118,6 +119,12 @@ namespace USDTWallet.Views
         private void OpenDatabaseDirectory()
         {
             var path = DataDirectoryHelper.GetDatabaseDirectoryPath();
+            System.Diagnostics.Process.Start(path);
+        }
+
+        private void OpenLogDirectory()
+        {
+            var path = DataDirectoryHelper.GetLogDirectoryPath();
             System.Diagnostics.Process.Start(path);
         }
 

@@ -52,16 +52,16 @@ namespace USDTWallet.Common.Operators
 
         public async Task<FeeRate> EstimateFeeRate()
         {
-            try
-            {
+            //try
+            //{
                 var result = await Client.EstimateSmartFeeAsync(1);
                 var feeRate = result.FeeRate;
                 return feeRate;
-            }
-            catch(NoEstimationException)
-            {
-                return new FeeRate((decimal)0);
-            }
+            //}
+            //catch(NoEstimationException)
+            //{
+            //    return new FeeRate((decimal)0);
+            //}
             
         }
     }
