@@ -59,6 +59,13 @@ namespace USDTWallet.Models.Models.Addresses
             set { SetProperty(ref _balance, value); }
         }
 
+        private Money _usdtbalance;
+        public Money USDTBalance
+        {
+            get { return _usdtbalance; }
+            set { SetProperty(ref _usdtbalance, value); }
+        }
+
         private string _account;
         public string Account
         {

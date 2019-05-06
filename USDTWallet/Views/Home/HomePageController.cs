@@ -182,19 +182,19 @@ namespace USDTWallet.Views.Home
             var addressList = CompanyAddresses.Select(q => q.Address).ToList();
             addressList.AddRange(CustomerAddresses.Select(q => q.Address));
 
-            await Task.Run(() =>
-            {
-                var balanceDict = AddressManager.BatchGetBTCBalanceViaNode(addressList);
-                foreach(var addr in CompanyAddresses)
-                {
-                    addr.Balance = balanceDict[addr.Address];
-                }
-                foreach (var addr in CustomerAddresses)
-                {
-                    addr.Balance = balanceDict[addr.Address];
-                }
+            var usdtBalanceDict = await AddressManager.BatchGetUSDTBalanceViaNode(addressList);
+            var balanceDict = AddressManager.BatchGetBTCBalanceViaNode(addressList);
 
-            });
+            foreach (var addr in CompanyAddresses)
+            {
+                addr.Balance = balanceDict[addr.Address];
+                addr.USDTBalance = usdtBalanceDict[addr.Address];
+            }
+            foreach (var addr in CustomerAddresses)
+            {
+                addr.Balance = balanceDict[addr.Address];
+                addr.USDTBalance = usdtBalanceDict[addr.Address];
+            }
         }
 
     }

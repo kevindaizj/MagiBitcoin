@@ -89,6 +89,7 @@
     <Compile Include="Operators\BTCOperator.cs" />
     <Compile Include="Operators\KeyOperator.cs" />
     <Compile Include="Operators\NetworkOperator.cs" />
+    <Compile Include="Operators\USDTOperator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

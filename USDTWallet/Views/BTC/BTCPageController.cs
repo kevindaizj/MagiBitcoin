@@ -126,7 +126,7 @@ namespace USDTWallet.Views.BTC
             var fromAddress = this.TransferInfo.FromAddress;
             if (!AddressHelper.IsValidAccountAddress(fromAddress))
                 return;
-            TransferInfo.BalanceOf = await AddressManager.GetBalance(fromAddress);
+            TransferInfo.BalanceOf = await AddressManager.GetBTCBalance(fromAddress);
         }
 
         private async void EstimateFeeRate()

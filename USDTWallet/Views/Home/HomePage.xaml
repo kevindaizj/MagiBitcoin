@@ -33,11 +33,15 @@
                         <StackPanel DockPanel.Dock="Left" Margin="17 15 6 0" VerticalAlignment="Center">
                                             <Image Source="/Images/avatar.png" Width="60" Height="60" />
                         </StackPanel>
-                        <StackPanel Margin="10 15 0 5">
+                        <StackPanel Margin="10 10 0 5">
                             <TextBlock Text="{Binding RootAddress.Name}" Width="155" FontSize="16" Foreground="#FFF" FontWeight="Bold" TextTrimming="CharacterEllipsis" />
-                            <StackPanel Orientation="Horizontal" Margin="0 6 0 3">
+                            <StackPanel Orientation="Horizontal" Margin="0 3 0 3">
                                     <TextBlock Text="{Binding RootAddress.Balance, Converter={StaticResource MoneyConverter}}" FontSize="12" Foreground="#FFF" MaxWidth="115" TextTrimming="CharacterEllipsis" />
                                     <TextBlock Margin="3 0" Foreground="#FFF" FontSize="12">BTC</TextBlock>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0 0 0 3">
+                                    <TextBlock Text="{Binding RootAddress.USDTBalance, Converter={StaticResource MoneyConverter}}" FontSize="12" Foreground="#FFF" MaxWidth="115" TextTrimming="CharacterEllipsis" />
+                                    <TextBlock Margin="3 0" Foreground="#FFF" FontSize="12">USDT</TextBlock>
                             </StackPanel>
                             <TextBlock Text="{Binding RootAddress.Address}" FontSize="12" TextTrimming="CharacterEllipsis" Width="155" Foreground="#fff" />
                         </StackPanel>
@@ -96,12 +100,16 @@
                                         <StackPanel DockPanel.Dock="Left" Margin="17 15 6 0" VerticalAlignment="Center">
                                             <Image Source="/Images/avatar.png" Width="60" Height="60" />
                                         </StackPanel>
-                                        <StackPanel Margin="10 15 0 5">
+                                        <StackPanel Margin="10 10 0 5">
                                             <TextBlock Text="{Binding Name}" Width="155" FontSize="16" Foreground="#FFF" FontWeight="Bold" TextTrimming="CharacterEllipsis"
                                             />
-                                            <StackPanel Orientation="Horizontal" Margin="0 6 0 3">
+                                            <StackPanel Orientation="Horizontal" Margin="0 3 0 3">
                                                 <TextBlock Text="{Binding Balance, Converter={StaticResource MoneyConverter}}" FontSize="12" Foreground="#FFF" MaxWidth="115" TextTrimming="CharacterEllipsis" />
                                                 <TextBlock Margin="3 0" Foreground="#FFF" FontSize="12">BTC</TextBlock>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal" Margin="0 0 0 3">
+                                                <TextBlock Text="{Binding USDTBalance, Converter={StaticResource MoneyConverter}}" FontSize="12" Foreground="#FFF" MaxWidth="115" TextTrimming="CharacterEllipsis" />
+                                                <TextBlock Margin="3 0" Foreground="#FFF" FontSize="12">USDT</TextBlock>
                                             </StackPanel>
                                             <TextBlock Text="{Binding Address}" FontSize="12" TextTrimming="CharacterEllipsis" Width="155" Foreground="#fff" />
                                         </StackPanel>
@@ -164,12 +172,16 @@
                                         <StackPanel DockPanel.Dock="Left" Margin="17 15 6 0" VerticalAlignment="Center">
                                             <Image Source="/Images/avatar.png" Width="60" Height="60" />
                                         </StackPanel>
-                                        <StackPanel Margin="10 15 0 5">
+                                        <StackPanel Margin="10 10 0 5">
                                             <TextBlock Text="{Binding Name}" Width="155" FontSize="16" Foreground="#FFF" FontWeight="Bold" TextTrimming="CharacterEllipsis"
                                             />
-                                            <StackPanel Orientation="Horizontal" Margin="0 6 0 3">
+                                            <StackPanel Orientation="Horizontal" Margin="0 3 0 3">
                                                 <TextBlock Text="{Binding Balance, Converter={StaticResource MoneyConverter}}" FontSize="12" Foreground="#FFF" MaxWidth="115" TextTrimming="CharacterEllipsis" />
                                                 <TextBlock Margin="3 0" Foreground="#FFF" FontSize="12">BTC</TextBlock>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal" Margin="0 0 0 3">
+                                                <TextBlock Text="{Binding USDTBalance, Converter={StaticResource MoneyConverter}}" FontSize="12" Foreground="#FFF" MaxWidth="115" TextTrimming="CharacterEllipsis" />
+                                                <TextBlock Margin="3 0" Foreground="#FFF" FontSize="12">USDT</TextBlock>
                                             </StackPanel>
                                             <TextBlock Text="{Binding Address}" FontSize="12" TextTrimming="CharacterEllipsis" Width="155" Foreground="#fff" />
                                         </StackPanel>

@@ -130,9 +130,15 @@ namespace USDTWallet.Biz.Addresses
             return addresses.Select(o => o.Address).ToList();
         }
         
-        public async Task<Money> GetBalance(string address)
+        public async Task<Money> GetBTCBalance(string address)
         {
             var balance = await BTCOperator.Instance.GetBalanceByAddress(address);
+            return balance;
+        }
+
+        public async Task<Money> GetUSDTBalance(string address)
+        {
+            var balance = await USDTOperator.Instance.GetBalanceByAddress(address);
             return balance;
         }
 
@@ -161,6 +167,26 @@ namespace USDTWallet.Biz.Addresses
                 }
             }
             catch(Exception)
+            {
+
+            }
+
+            return result;
+        }
+
+        public async Task<Dictionary<string, Money>> BatchGetUSDTBalanceViaNode(List<string> addressList)
+        {
+            var result = new Dictionary<string, Money>();
+
+            try
+            {
+                foreach (var address in addressList)
+                {
+                    Money balance = await USDTOperator.Instance.GetBalanceByAddress(address);
+                    result.Add(address, balance);
+                }
+            }
+            catch (Exception)
             {
 
             }
