@@ -1,4 +1,5 @@
 ﻿using NBitcoin;
+using NBitcoin.JsonConverters;
 using NBitcoin.RPC;
 using System;
 using System.Collections.Generic;
@@ -6,6 +7,8 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using USDTWallet.Common.Helpers;
+using USDTWallet.Models.Models.Transactions;
 
 namespace USDTWallet.Common.Operators
 {
@@ -18,6 +21,8 @@ namespace USDTWallet.Common.Operators
         }
         
         private RPCClient Client { get; set; }
+
+        private readonly string EncryptUnsignedTxKey = "PtquPkgNaG1DEC0rQwZP";
         
         private BTCOperator()
         {
@@ -149,20 +154,95 @@ namespace USDTWallet.Common.Operators
         }
 
 
-        public async Task SignAndSendTransaction(string privKey, string transactionHex)
+        public async Task SignAndSendTransaction(string privKey, string transactionHex, List<Coin> spentCoins)
         {
             var network = NetworkOperator.Instance.Network;
             var privateKey = Key.Parse(privKey, network);
             var tx = Transaction.Parse(transactionHex, network);
-
-            var builder = network.CreateTransactionBuilder();
-            builder.AddKeys(privateKey);
-            tx = builder.ContinueToBuild(tx).BuildTransaction(true);
+            tx.Sign(privateKey, spentCoins.ToArray());
 
             var a = tx.ToString();
 
             await Client.SendRawTransactionAsync(tx);
         }
+
+        public string SerailizeUnsignedTxResult(UnsignTransactionResult txInfo)
+        {
+            var joint = new UnsignedTxJoint
+            {
+                TransactionHex = txInfo.Transaction.ToHex(),
+                ToSpentCoins = txInfo.ToSpentCoins
+            };
+
+            var json = Serializer.ToString(joint);
+
+            var result = CryptHelper.AESEncryptText(json, EncryptUnsignedTxKey);
+            return result;
+        }
+
+        public UnsignTransactionResult DeserailizeUnsignedTxResult(string str)
+        {
+            var json = CryptHelper.AESDecryptText(str, EncryptUnsignedTxKey);
+            var joint = Serializer.ToObject<UnsignedTxJoint>(json);
+            var tx = Transaction.Parse(joint.TransactionHex, NetworkOperator.Instance.Network);
+
+            return new UnsignTransactionResult
+            {
+                Transaction = tx,
+                ToSpentCoins = joint.ToSpentCoins
+            };
+        }
+
+        public bool CheckUnsignedTxInfo(string info)
+        {
+            try
+            {
+                var json = CryptHelper.AESDecryptText(info, EncryptUnsignedTxKey);
+                var joint = Serializer.ToObject<UnsignedTxJoint>(json);
+                return this.CheckTx(joint.TransactionHex);
+            }
+            catch(Exception)
+            {
+                return false;
+            }
+        }
+
+
+        public bool ValidateAddresses(List<string> addresses)
+        {
+            foreach(var a in addresses)
+            {
+                bool valid = this.ValidateAddress(a);
+                if (!valid)
+                    return false;
+            }
+
+            return true;
+        }
+
+        public bool ValidateAddress(string address)
+        {
+            try
+            {
+                BitcoinAddress.Create(address, NetworkOperator.Instance.Network);
+                return true;
+            }
+            catch(Exception)
+            {
+                return false;
+            }
+        }
+
+
+        public async Task ImportWatchOnlyAddresses(List<string> addresses, string label, bool rescan = false)
+        {
+            foreach(var addr in addresses)
+            {
+                var address = BitcoinAddress.Create(addr, NetworkOperator.Instance.Network);
+                await Client.ImportAddressAsync(address, label, rescan);
+            }
+        }
+
 
     }
 }

@@ -8,6 +8,6 @@ namespace USDTWallet.Common.Exceptions
 {
     public enum ExceptionCode
     {
-        
+        InvalidAddress,
     }
 }

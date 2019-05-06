@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using USDTWallet.Biz.Common;
+using USDTWallet.Common.Exceptions;
 using USDTWallet.Common.Operators;
 using USDTWallet.Dao.Address;
 using USDTWallet.Models.Enums.Address;
@@ -32,7 +33,7 @@ namespace USDTWallet.Biz.Addresses
                 AddressType = addressInfo.AddressType,
                 AddressCategory = addressInfo.AddressCategory,
                 Name = addressInfo.Name,
-                Balance = addressInfo.Balance,
+                Balance = new Money((decimal)addressInfo.Balance, MoneyUnit.BTC),
                 Account = addressInfo.Account
             };
         }
@@ -52,7 +53,7 @@ namespace USDTWallet.Biz.Addresses
                     AddressType = a.AddressType,
                     AddressCategory = a.AddressCategory,
                     Name = a.Name,
-                    Balance = a.Balance,
+                    Balance = new Money((decimal)a.Balance, MoneyUnit.BTC),
                     Account = a.Account
                 });
             }
@@ -94,7 +95,8 @@ namespace USDTWallet.Biz.Addresses
             AddressDao.Create(addressInfo);
 
         }
-        
+
+
         public List<string> CreateCustomerAddresses(int count)
         {
             var customerId = AddressDao.GetMaxCustomerId(CurrentWallet.Id);
@@ -132,6 +134,38 @@ namespace USDTWallet.Biz.Addresses
         {
             var balance = await BTCOperator.Instance.GetBalanceByAddress(address);
             return balance;
+        }
+
+
+        public async Task ImportWatchOnlyAddresses(List<string> addresses, string label)
+        {
+            bool valid = BTCOperator.Instance.ValidateAddresses(addresses);
+            if (!valid)
+                throw new WTException(ExceptionCode.InvalidAddress, "地址格式不正确");
+
+            await BTCOperator.Instance.ImportWatchOnlyAddresses(addresses, label);
+        }
+
+        public Dictionary<string, Money> BatchGetBTCBalanceViaNode(List<string> addressList)
+        {
+            var result = new Dictionary<string, Money>();
+
+            try
+            {
+                var group = BTCOperator.Instance.ListAddressGroupings();
+                foreach (var address in addressList)
+                {
+                    var g = group.SingleOrDefault(q => q.PublicAddress.ToString() == address);
+                    Money balance = null != g ? g.Amount : Money.Parse("0");
+                    result.Add(address, balance);
+                }
+            }
+            catch(Exception)
+            {
+
+            }
+
+            return result;
         }
     }
 }

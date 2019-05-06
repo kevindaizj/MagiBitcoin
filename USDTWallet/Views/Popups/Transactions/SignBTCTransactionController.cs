@@ -8,19 +8,14 @@ using System.Text;
 using System.Threading.Tasks;
 using USDTWallet.Common;
 using USDTWallet.Common.Operators;
+using USDTWallet.Models.Models.Transactions;
 using USDTWallet.PopupNotifications;
 
 namespace USDTWallet.Views.Popups.Transactions
 {
     public class SignBTCTransactionController : ControllerBase, IInteractionRequestAware
     {
-        private string _txHex;
-        public string TxHex
-        {
-            get { return _txHex; }
-            set { this.SetProperty(ref _txHex, value); }
-        }
-
+        
         private string _txJson;
         public string TxJson
         {
@@ -37,6 +32,8 @@ namespace USDTWallet.Views.Popups.Transactions
 
         private Transaction Transaction { get; set; }
 
+        private List<Coin> SpentCoins { get; set; }
+
         public Action FinishInteraction { get; set; }
 
         private INotification _notification;
@@ -46,8 +43,7 @@ namespace USDTWallet.Views.Popups.Transactions
             set
             {
                 SetProperty(ref _notification, value);
-                this.TxHex = (string)_notification.Content;
-                this.InitData();
+                this.InitData((UnsignTransactionResult)_notification.Content);
             }
         }
 
@@ -59,9 +55,10 @@ namespace USDTWallet.Views.Popups.Transactions
         }
 
 
-        private void InitData()
+        private void InitData(UnsignTransactionResult txInfo)
         {
-            this.Transaction = BTCOperator.Instance.ParseTransaction(this.TxHex);
+            this.Transaction = txInfo.Transaction;
+            this.SpentCoins = txInfo.ToSpentCoins;
             this.TxJson = this.Transaction.ToString();
         }
 
@@ -71,7 +68,7 @@ namespace USDTWallet.Views.Popups.Transactions
             if (string.IsNullOrWhiteSpace(PrivKey))
                 return;
 
-            await BTCOperator.Instance.SignAndSendTransaction(PrivKey, this.TxHex);
+            await BTCOperator.Instance.SignAndSendTransaction(PrivKey, this.Transaction.ToHex(), this.SpentCoins);
             this.FinishInteraction?.Invoke();
         }
     }

@@ -1,4 +1,5 @@
-﻿using Prism.Interactivity.InteractionRequest;
+﻿using Prism.Commands;
+using Prism.Interactivity.InteractionRequest;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,6 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 using USDTWallet.Biz.Transactions;
 using USDTWallet.Common;
+using USDTWallet.Common.Operators;
+using USDTWallet.ControlService.Clipb;
+using USDTWallet.ControlService.Toast;
 using USDTWallet.Models.Models.Transfer;
 using USDTWallet.PopupNotifications;
 
@@ -48,18 +52,34 @@ namespace USDTWallet.Views.Popups.Transactions
             }
         }
         
+        public DelegateCommand CopyTxCommand { get; set; }
+
+        private ToastService Toast { get; set; }
+        private ClipboardService Clipboard { get; set; }
+
         private BTCTransactionManager TxManager { get; set; }
 
-        public GenBTCTransactionController(BTCTransactionManager txManager)
+        public GenBTCTransactionController(BTCTransactionManager txManager, ToastService toast, ClipboardService clip)
         {
             this.TxManager = txManager;
+            this.Toast = toast;
+            this.Clipboard = clip;
+            this.CopyTxCommand = new DelegateCommand(CopyTx);
         }
 
         private async void GenTx()
         {
-            var tx = await TxManager.BuildUnsignedTransaction(this.TransferInfo);
-            this.TxHex = tx.ToHex();
-            this.TxJson = tx.ToString();
+            var result = await TxManager.BuildUnsignedTransaction(this.TransferInfo);
+            this.TxJson = result.Transaction.ToString();
+            this.TxHex = BTCOperator.Instance.SerailizeUnsignedTxResult(result);
         }
+
+
+        private void CopyTx()
+        {
+            this.Clipboard.SetText(this.TxHex);
+            this.Toast.Success("复制成功");
+        }
+
     }
 }

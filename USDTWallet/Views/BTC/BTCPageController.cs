@@ -51,11 +51,11 @@ namespace USDTWallet.Views.BTC
             set { this.SetProperty(ref _transferInfo, value); }
         }
 
-        private string _unsignedTxHex;
-        public string UnsignedTxHex
+        private string _unsignedTxInfo;
+        public string UnsignedTxInfo
         {
-            get { return _unsignedTxHex; }
-            set { SetProperty(ref _unsignedTxHex, value); }
+            get { return _unsignedTxInfo; }
+            set { SetProperty(ref _unsignedTxInfo, value); }
         }
 
         public DelegateCommand EstimateFeeRateCommand { get; set; }
@@ -104,18 +104,20 @@ namespace USDTWallet.Views.BTC
 
         private void SignTransaction()
         {
-            if (string.IsNullOrEmpty(this.UnsignedTxHex))
+            if (string.IsNullOrEmpty(this.UnsignedTxInfo))
                 return;
-
-            bool valid = BTCOperator.Instance.CheckTx(this.UnsignedTxHex);
+            
+            bool valid = BTCOperator.Instance.CheckUnsignedTxInfo(this.UnsignedTxInfo);
             if (!valid)
             {
-                this.MessageBoxService.Show("交易Hex不正确，请确认");
+                this.MessageBoxService.Show("交易字符串不符合规定，请确认");
                 return;
             }
 
+            var result = BTCOperator.Instance.DeserailizeUnsignedTxResult(this.UnsignedTxInfo);
+
             this.SignBtnContent = "签署中...";
-            SignTransactionPopupRequest.Raise(new Notification { Title = "签署", Content = this.UnsignedTxHex });
+            SignTransactionPopupRequest.Raise(new Notification { Title = "签署", Content = result });
             this.SignBtnContent = "签署";
         }
 

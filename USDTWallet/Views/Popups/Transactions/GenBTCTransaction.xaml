@@ -9,9 +9,9 @@
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              mc:Ignorable="d" 
              prism:ViewModelLocator.AutoWireViewModel="True"
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="750" d:DesignWidth="800">
     
-    <Grid Width="660" Height="600" Background="#FFF" >
+    <Grid Width="660" Height="660" Background="#FFF" >
         <StackPanel VerticalAlignment="Center" Visibility="{Binding TxHex, Converter={StaticResource NullBoolToVisibility}}">
             <TextBlock TextAlignment="Center" FontSize="25">生成中...</TextBlock>
             <Image gif:ImageBehavior.AnimatedSource="/Images/loading.gif" Width="100" Height="100" Margin="10 10 10 0" />
@@ -23,8 +23,15 @@
                 <TextBox Width="560" Height="360" IsReadOnly="True" Text="{Binding TxJson}" TextWrapping="Wrap"></TextBox>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="0 20 0 0">
-                <TextBlock Width="60" TextAlignment="Right" Margin="0 0 10 0"  VerticalAlignment="Top">交易Hex:</TextBlock>
-                <TextBox Width="560" Height="100" IsReadOnly="True" Text="{Binding TxHex}" TextWrapping="Wrap"></TextBox>
+                <TextBlock Width="60" TextAlignment="Right" Margin="0 0 10 0"  VerticalAlignment="Top">交易:</TextBlock>
+                <TextBox Width="560" Height="160" IsReadOnly="True" Text="{Binding TxHex}" TextWrapping="Wrap"></TextBox>
+            </StackPanel>
+            <StackPanel Margin="0 30 0 0" Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button Command="{Binding CopyTxCommand}" Style="{StaticResource TransferBtnStyle }" Margin="0 0 10 0">
+                    <Button.Content>
+                        <TextBlock TextAlignment="Center" VerticalAlignment="Center" Text="复制交易"></TextBlock>
+                    </Button.Content>
+                </Button>
             </StackPanel>
         </StackPanel>
     </Grid>

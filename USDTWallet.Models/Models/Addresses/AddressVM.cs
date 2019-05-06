@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NBitcoin;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -51,8 +52,8 @@ namespace USDTWallet.Models.Models.Addresses
             set { SetProperty(ref _name, value); }
         }
 
-        private double _balance;
-        public double Balance
+        private Money _balance;
+        public Money Balance
         {
             get { return _balance; }
             set { SetProperty(ref _balance, value); }

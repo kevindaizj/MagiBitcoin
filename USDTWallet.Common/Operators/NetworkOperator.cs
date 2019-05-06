@@ -60,7 +60,7 @@ namespace USDTWallet.Common.Operators
                 await BTCOperator.Instance.GetBalance();
                 connected = true;
             }
-            catch(Exception ex)
+            catch(Exception)
             {
 
             }

@@ -8,12 +8,15 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Threading;
 using USDTWallet.Biz.Accounts;
 using USDTWallet.Biz.Addresses;
 using USDTWallet.Biz.Wallet;
 using USDTWallet.Common;
 using USDTWallet.Common.Operators;
+using USDTWallet.ControlService.Clipb;
 using USDTWallet.ControlService.MsgBox;
+using USDTWallet.ControlService.Toast;
 using USDTWallet.Events;
 using USDTWallet.Models.Enums.Address;
 using USDTWallet.Models.Models.Addresses;
@@ -60,17 +63,29 @@ namespace USDTWallet.Views.Home
         
         public AddressManager AddressManager { get; set; }
         private MessageBoxService MsgBox { get; set; }
+        private ClipboardService Clipboard { get; set; }
+        private ToastService Toast { get; set; }
 
         private IEventAggregator EventAggregator { get; set; }
 
         public DelegateCommand<string> CreateAddressCommand { get; set; }
-
         public InteractionRequest<INotification> CreateAddressPopupRequest { get; set; }
 
-        public HomePageController(AddressManager addressManager, MessageBoxService msgBox, IEventAggregator eventAggregator)
+        public DelegateCommand<string> AddWachtOnlyAddressCommand { get; set; }
+        public InteractionRequest<INotification> AddWachtOnlyAddressPopupRequest { get; set; }
+        
+        public DelegateCommand<string> AccountDetailCommand { get; set; }
+
+        private DispatcherTimer BalanceTimer { get; set; }
+
+
+        public HomePageController(AddressManager addressManager, IEventAggregator eventAggregator,
+                    MessageBoxService msgBox, ClipboardService clip, ToastService toast)
         {
             this.AddressManager = addressManager;
             this.MsgBox = msgBox;
+            this.Clipboard = clip;
+            this.Toast = toast;
             this.EventAggregator = eventAggregator;
 
             this.RootAddress = new AddressVM();
@@ -81,9 +96,17 @@ namespace USDTWallet.Views.Home
             this.CreateAddressCommand = new DelegateCommand<string>(CreateAddress);
             this.CreateAddressPopupRequest = new InteractionRequest<INotification>();
 
+            this.AddWachtOnlyAddressCommand = new DelegateCommand<string>(AddWatchOnlyAddress);
+            this.AddWachtOnlyAddressPopupRequest = new InteractionRequest<INotification>();
+
+            this.AccountDetailCommand = new DelegateCommand<string>(addr =>
+            {
+                this.Clipboard.SetText(addr);
+                this.Toast.Success("成功复制地址");
+            });
+
             EventAggregator.GetEvent<CreateAddressSuccessEvent>().Subscribe(AfterCreateAddress);
         }
-        
 
         private void Initialize()
         {
@@ -100,6 +123,8 @@ namespace USDTWallet.Views.Home
             this.AnyCustomerAddress = companyAddresses.Count() > 0;
             this.CustomerAddresses.Clear();
             this.CustomerAddresses.AddRange(customerAddresses);
+
+            ResetBalanceTimer();
         }
 
         private void CreateAddress(string type)
@@ -128,5 +153,49 @@ namespace USDTWallet.Views.Home
                 CustomerAddresses.AddRange(addresses);
             }
         }
+
+
+        private void AddWatchOnlyAddress(string type)
+        {
+            long addressType = long.Parse(type);
+            var title = "Watch Only公司地址";
+            if (addressType == (long)CustomAddressType.Customer)
+                title = "Watch Only客户地址";
+
+            AddWachtOnlyAddressPopupRequest.Raise(new Notification { Title = title, Content = addressType });
+        }
+
+
+        private void ResetBalanceTimer()
+        {
+            BalanceTimer?.Stop();
+            BalanceTimer = null;
+
+            BalanceTimer = new DispatcherTimer();
+            BalanceTimer.Interval = new TimeSpan(0, 0, 3);
+            BalanceTimer.Tick += GetBalances;
+            BalanceTimer.Start();
+        }
+
+        private async void GetBalances(object sender, EventArgs e)
+        {
+            var addressList = CompanyAddresses.Select(q => q.Address).ToList();
+            addressList.AddRange(CustomerAddresses.Select(q => q.Address));
+
+            await Task.Run(() =>
+            {
+                var balanceDict = AddressManager.BatchGetBTCBalanceViaNode(addressList);
+                foreach(var addr in CompanyAddresses)
+                {
+                    addr.Balance = balanceDict[addr.Address];
+                }
+                foreach (var addr in CustomerAddresses)
+                {
+                    addr.Balance = balanceDict[addr.Address];
+                }
+
+            });
+        }
+
     }
 }

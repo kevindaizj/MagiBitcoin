@@ -187,6 +187,10 @@
       <DependentUpon>CreateAddress.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Popups\Addresses\CreateAddressController.cs" />
+    <Compile Include="Views\Popups\Addresses\WatchOnlyAddress.xaml.cs">
+      <DependentUpon>WatchOnlyAddress.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Popups\Addresses\WatchOnlyAddressController.cs" />
     <Compile Include="Views\Popups\Networks\ChangeNetwork.xaml.cs">
       <DependentUpon>ChangeNetwork.xaml</DependentUpon>
     </Compile>
@@ -238,6 +242,10 @@
     <Page Include="Views\Popups\Addresses\CreateAddress.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Popups\Addresses\WatchOnlyAddress.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Popups\Networks\ChangeNetwork.xaml">
       <SubType>Designer</SubType>
