@@ -99,6 +99,7 @@ namespace USDTWallet.Common.Operators
             results = SelectCoinsFrom(unconfirmedCoins, totalAmount);
             return results;
         }
+        
 
         private List<Coin> SelectCoinsFrom(List<Coin> coins, Money totalAmount)
         {
@@ -152,9 +153,8 @@ namespace USDTWallet.Common.Operators
         {
             return Transaction.Parse(txHex, NetworkOperator.Instance.Network);
         }
-
-
-        public async Task SignAndSendTransaction(string privKey, string transactionHex, List<Coin> spentCoins)
+        
+        public async Task SignAndSendTransactionByPrivateKey(string privKey, string transactionHex, List<Coin> spentCoins)
         {
             var network = NetworkOperator.Instance.Network;
             var privateKey = Key.Parse(privKey, network);
@@ -240,6 +240,15 @@ namespace USDTWallet.Common.Operators
             {
                 var address = BitcoinAddress.Create(addr, NetworkOperator.Instance.Network);
                 await Client.ImportAddressAsync(address, label, rescan);
+            }
+        }
+
+        public async Task ImportPrivateKeyToNode(List<string> privateKeys, string label, bool rescan = false)
+        {
+            foreach (var key in privateKeys)
+            {
+                var privateKey = Key.Parse(key, NetworkOperator.Instance.Network);
+                await Client.ImportPrivKeyAsync(privateKey.GetBitcoinSecret(NetworkOperator.Instance.Network), label, rescan);
             }
         }
 

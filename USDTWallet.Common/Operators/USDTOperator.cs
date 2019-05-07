@@ -20,7 +20,7 @@ namespace USDTWallet.Common.Operators
 
         private RPCClient Client { get; set; }
 
-        public static readonly UInt64 PropertyId = 2147483652;
+        public static readonly UInt64 PropertyId = 2147483651;
 
         private USDTOperator()
         {

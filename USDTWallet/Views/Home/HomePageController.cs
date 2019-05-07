@@ -185,15 +185,22 @@ namespace USDTWallet.Views.Home
             var usdtBalanceDict = await AddressManager.BatchGetUSDTBalanceViaNode(addressList);
             var balanceDict = AddressManager.BatchGetBTCBalanceViaNode(addressList);
 
+            if (balanceDict.Count <= 0 && usdtBalanceDict.Count <= 0)
+                return;
+            
             foreach (var addr in CompanyAddresses)
             {
-                addr.Balance = balanceDict[addr.Address];
-                addr.USDTBalance = usdtBalanceDict[addr.Address];
+                if(balanceDict.Count > 0)
+                    addr.Balance = balanceDict[addr.Address];
+                if(usdtBalanceDict.Count > 0)
+                    addr.USDTBalance = usdtBalanceDict[addr.Address];
             }
             foreach (var addr in CustomerAddresses)
             {
-                addr.Balance = balanceDict[addr.Address];
-                addr.USDTBalance = usdtBalanceDict[addr.Address];
+                if (balanceDict.Count > 0)
+                    addr.Balance = balanceDict[addr.Address];
+                if (usdtBalanceDict.Count > 0)
+                    addr.USDTBalance = usdtBalanceDict[addr.Address];
             }
         }
 

@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace USDTWallet.Views.Popups.Addresses
 {
     /// <summary>
-    /// Interaction logic for WatchOnlyAddress.xaml
+    /// Interaction logic for ImportAddressToWatch.xaml
     /// </summary>
-    public partial class WatchOnlyAddress : UserControl
+    public partial class ImportAddressToWatch : UserControl
     {
-        public WatchOnlyAddress()
+        public ImportAddressToWatch()
         {
             InitializeComponent();
         }

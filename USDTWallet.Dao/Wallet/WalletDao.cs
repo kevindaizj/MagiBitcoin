@@ -60,5 +60,24 @@ namespace USDTWallet.Dao.Wallet
                 return query.SingleOrDefault();
             }
         }
+
+        public WalletInfo GetWalletById(string walletId)
+        {
+            using (var db = this.GetWalletContext())
+            {
+                var query = from w in db.BASE_WALLET
+                            where w.ID == walletId
+                            select new WalletInfo
+                            {
+                                Id = w.ID,
+                                WalletName = w.WALLET_NAME,
+                                Description = w.DESCRIPTION,
+                                Password = w.PASSWORD,
+                                MnemonicWords = w.MNEMONIC_WORDS
+                            };
+
+                return query.SingleOrDefault();
+            }
+        }
     }
 }

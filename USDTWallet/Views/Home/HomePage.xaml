@@ -206,7 +206,7 @@
             </prism:PopupWindowAction>
         </prism:InteractionRequestTrigger>
         <prism:InteractionRequestTrigger SourceObject="{Binding AddWachtOnlyAddressPopupRequest}">
-            <prism:PopupWindowAction IsModal="True" CenterOverAssociatedObject="True"  WindowContentType="{x:Type popup:WatchOnlyAddress}" WindowStartupLocation="CenterScreen">
+            <prism:PopupWindowAction IsModal="True" CenterOverAssociatedObject="True"  WindowContentType="{x:Type popup:ImportAddressToWatch}" WindowStartupLocation="CenterScreen">
             </prism:PopupWindowAction>
         </prism:InteractionRequestTrigger>
     </i:Interaction.Triggers>

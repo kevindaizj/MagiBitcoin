@@ -12,7 +12,7 @@ using USDTWallet.Models.Enums.Address;
 
 namespace USDTWallet.Views.Popups.Addresses
 {
-    public class WatchOnlyAddressController : BindableBase, IInteractionRequestAware
+    class ImportAddressToWatchController : BindableBase, IInteractionRequestAware
     {
         public Action FinishInteraction { get; set; }
 
@@ -48,6 +48,13 @@ namespace USDTWallet.Views.Popups.Addresses
             set { SetProperty(ref _addresses, value); }
         }
 
+        private bool _isWatchOnly = true;
+        public bool IsWatchOnly
+        {
+            get { return _isWatchOnly; }
+            set { SetProperty(ref _isWatchOnly, value); }
+        }
+
         private string _accountName;
         public string AccountName
         {
@@ -60,7 +67,7 @@ namespace USDTWallet.Views.Popups.Addresses
         private MessageBoxService MsgBox { get; set; }
         private AddressManager AddressManager { get; set; }
 
-        public WatchOnlyAddressController(AddressManager addressManger, MessageBoxService msgBox)
+        public ImportAddressToWatchController(AddressManager addressManger, MessageBoxService msgBox)
         {
             this.ImportCommand = new DelegateCommand(ImportAddress);
             this.MsgBox = msgBox;
@@ -77,8 +84,12 @@ namespace USDTWallet.Views.Popups.Addresses
             {
                 MsgBox.Show("必须为逗号分隔的地址字符串");
             }
-             
-            await AddressManager.ImportWatchOnlyAddresses(addrList, this.AccountName);
+
+            if (IsWatchOnly)
+                await AddressManager.ImportWatchOnlyAddresses(addrList, this.AccountName);
+            else
+                await AddressManager.ImportWatchAddressesWithPrivKeys(addrList, this.AccountName);
+
             this.FinishInteraction?.Invoke();
         }
     }

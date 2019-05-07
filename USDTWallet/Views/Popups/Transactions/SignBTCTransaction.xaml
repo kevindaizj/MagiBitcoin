@@ -7,10 +7,11 @@
              xmlns:prism="http://prismlibrary.com/"
              xmlns:gif="http://wpfanimatedgif.codeplex.com"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:behavior="clr-namespace:USDTWallet.Behaviors"
              mc:Ignorable="d" 
              prism:ViewModelLocator.AutoWireViewModel="True"
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid Width="660" Height="600" Background="#FFF" >
+             d:DesignHeight="650" d:DesignWidth="800">
+    <Grid Width="660" Height="650" Background="#FFF" >
 
         <StackPanel Margin="10 20">
             <StackPanel Orientation="Horizontal" Margin="0 5 0 0">
@@ -18,7 +19,20 @@
                 <TextBox Width="560" Height="360" IsReadOnly="True" Text="{Binding TxJson}" TextWrapping="Wrap"></TextBox>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="0 20 0 0">
-                <TextBlock Width="60" TextAlignment="Right" Margin="0 0 10 0"  VerticalAlignment="Center">私钥:</TextBlock>
+                <TextBlock Width="60" TextAlignment="Right" Margin="0 0 10 0"  VerticalAlignment="Center">签署方式:</TextBlock>
+                <RadioButton GroupName="method" IsChecked="{Binding PwdMethod}" Content="密码"></RadioButton>
+                <RadioButton GroupName="method" Margin="20 0 0 0" IsChecked="{Binding PrivKeyMethod}" Content="私钥"></RadioButton>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0 20 0 0" Visibility="{Binding PwdMethod, Converter={StaticResource BoolToVisibility}}">
+                <TextBlock Width="60" TextAlignment="Right" Margin="0 0 10 0" VerticalAlignment="Center">密码：</TextBlock>
+                <PasswordBox Width="560" Height="30" VerticalContentAlignment="Center">
+                    <i:Interaction.Behaviors>
+                        <behavior:PasswordBoxBehavior TransferPassword="{Binding Password, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay }" />
+                    </i:Interaction.Behaviors>
+                </PasswordBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0 20 0 0" Visibility="{Binding PrivKeyMethod, Converter={StaticResource BoolToVisibility}}">
+                <TextBlock Width="60" TextAlignment="Right" Margin="0 0 10 0"  VerticalAlignment="Center">私钥：</TextBlock>
                 <TextBox Width="560" Height="30" Text="{Binding PrivKey}" VerticalContentAlignment="Center"></TextBox>
             </StackPanel>
             <StackPanel Margin="0 30 0 0" Orientation="Horizontal" HorizontalAlignment="Center">

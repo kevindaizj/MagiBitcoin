@@ -96,7 +96,6 @@ namespace USDTWallet.Biz.Addresses
 
         }
 
-
         public List<string> CreateCustomerAddresses(int count)
         {
             var customerId = AddressDao.GetMaxCustomerId(CurrentWallet.Id);
@@ -151,6 +150,31 @@ namespace USDTWallet.Biz.Addresses
 
             await BTCOperator.Instance.ImportWatchOnlyAddresses(addresses, label);
         }
+
+
+        public async Task ImportWatchAddressesWithPrivKeys(List<string> addresses, string accountName)
+        {
+            bool valid = BTCOperator.Instance.ValidateAddresses(addresses);
+            if (!valid)
+                throw new WTException(ExceptionCode.InvalidAddress, "地址格式不正确");
+
+            var addressInfos = AddressDao.GetByAddresses(CurrentWallet.Id, addresses);
+            var privateKeys = new List<string>();
+            var network = NetworkOperator.Instance.Network;
+
+            foreach(var addr in addressInfos)
+            {
+                var keyPath = new KeyPath(addr.KeyPath);
+                var rootXPrivKey = ExtKey.Parse(CurrentWallet.RootXPrivKey, network);
+                var xPrivKey = rootXPrivKey.Derive(keyPath);
+                var privKeyWif = xPrivKey.PrivateKey.GetWif(network).ToString();
+
+                privateKeys.Add(privKeyWif);
+            }
+
+            await BTCOperator.Instance.ImportPrivateKeyToNode(privateKeys, accountName);
+        }
+
 
         public Dictionary<string, Money> BatchGetBTCBalanceViaNode(List<string> addressList)
         {

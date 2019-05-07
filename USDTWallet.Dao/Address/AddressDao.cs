@@ -42,6 +42,37 @@ namespace USDTWallet.Dao.Address
             }
         }
 
+
+        public List<AddressInfo> GetByAddresses(string walletId, List<string> addresses)
+        {
+            using (var db = this.GetWalletContext())
+            {
+                var query = from a in db.BASE_ADDRESS
+                            where addresses.Contains(a.ADDRESS) &&
+                                  a.WALLET_ID == walletId
+                            select new AddressInfo
+                            {
+                                Id = a.ID,
+                                Address = a.ADDRESS,
+                                ExtPubKeyWif = a.EXTPUBKEY_WIF,
+                                WalletId = a.WALLET_ID,
+                                Network = a.NETWORK,
+                                KeyPath = a.KEY_PATH,
+                                ParentKeyPath = a.PARENT_KEY_PATH,
+                                CustomerId = a.CUSTOMER_ID,
+                                PathIndex = a.PATH_INDEX,
+                                AddressType = a.ADDRESS_TYPE,
+                                AddressCategory = a.ADDRESS_CATEGORY,
+                                Name = a.NAME,
+                                Balance = a.BALANCE,
+                                Account = a.ACCOUNT,
+                                Description = a.DESCRIPTION
+                            };
+
+                return query.ToList();
+            }
+        }
+
         public List<AddressInfo> GetAddressesByType(string walletId, long type)
         {
             using (var db = this.GetWalletContext())
