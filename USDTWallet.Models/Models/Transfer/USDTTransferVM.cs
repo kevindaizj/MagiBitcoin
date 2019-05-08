@@ -34,14 +34,14 @@ namespace USDTWallet.Models.Models.Transfer
         }
 
 
-        private string _changeAddr;
+        private string _feeAddr;
 
-        [Required(ErrorMessage = "找零地址不能为空")]
+        [Required(ErrorMessage = "付手续费地址不能为空")]
         [RegularExpression("[^OIl0]{25,34}$", ErrorMessage = "地址格式不正确")]
-        public string ChangeAddress
+        public string FeeAddress
         {
-            get { return _changeAddr; }
-            set { this.SetProperty(ref _changeAddr, value); }
+            get { return _feeAddr; }
+            set { this.SetProperty(ref _feeAddr, value); }
         }
 
 

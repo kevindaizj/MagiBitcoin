@@ -10,6 +10,7 @@ namespace USDTWallet.Common.Exceptions
     {
         InvalidAddress,
         WrongWalletPassword,
-        AddressNotExisted
+        AddressNotExisted,
+        insufficientBTC
     }
 }

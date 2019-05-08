@@ -1,4 +1,5 @@
-﻿using Prism.Commands;
+﻿using NBitcoin;
+using Prism.Commands;
 using Prism.Events;
 using Prism.Interactivity.InteractionRequest;
 using Prism.Regions;
@@ -181,9 +182,15 @@ namespace USDTWallet.Views.Home
         {
             var addressList = CompanyAddresses.Select(q => q.Address).ToList();
             addressList.AddRange(CustomerAddresses.Select(q => q.Address));
-
+            
             var usdtBalanceDict = await AddressManager.BatchGetUSDTBalanceViaNode(addressList);
-            var balanceDict = AddressManager.BatchGetBTCBalanceViaNode(addressList);
+            var balanceDict = new Dictionary<string, Money>();
+
+            await Task.Run(() =>
+            {
+                balanceDict = AddressManager.BatchGetBTCBalanceViaNode(addressList);
+            });
+            
 
             if (balanceDict.Count <= 0 && usdtBalanceDict.Count <= 0)
                 return;

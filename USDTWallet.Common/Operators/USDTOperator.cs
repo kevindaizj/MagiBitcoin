@@ -22,6 +22,8 @@ namespace USDTWallet.Common.Operators
 
         public static readonly UInt64 PropertyId = 2147483651;
 
+        public static readonly decimal MinTxFee = 0.0000546M;
+
         private USDTOperator()
         {
             this.ChangeNetwork(NetworkOperator.Instance.Credential,
@@ -41,8 +43,28 @@ namespace USDTWallet.Common.Operators
             return Money.Parse(result.balance);
         }
 
+        public async Task<string> CreatePayloadSimpleSend(Money amount)
+        {
+            var resp = await Client.SendCommandAsync("omni_createpayload_simplesend", PropertyId, amount.ToString());
+            return resp.Result.ToString();
+        }
 
-        public Transaction BuildUnsignedTx(string fromAddress, string toAddress, string changeAddress, Money amount, FeeRate estimateFeeRate, List<Coin> spentCoins)
+        public async Task<string> GenerateOpRetrun(string transactionHex, string payloadHex)
+        {
+            var resp = await Client.SendCommandAsync("omni_createrawtx_opreturn", transactionHex, payloadHex);
+            return resp.Result.ToString();
+        }
+
+        public async Task<string> GenerateReference(string opreturn, string toAddress)
+        {
+            var resp = await Client.SendCommandAsync("omni_createrawtx_reference", opreturn, toAddress);
+            return resp.Result.ToString();
+        }
+
+
+
+
+        public async Task<Transaction> BuildUnsignedTx(string fromAddress, string toAddress, string changeAddress, Money amount, FeeRate estimateFeeRate, List<Coin> spentCoins)
         {
             var network = NetworkOperator.Instance.Network;
             var to = BitcoinAddress.Create(toAddress, network);
@@ -50,21 +72,15 @@ namespace USDTWallet.Common.Operators
 
             var builder = network.CreateTransactionBuilder();
             var tx = builder.AddCoins(spentCoins)
-                            .SendFees("0.00001")
                             .SetChange(change)
                             .SendEstimatedFees(estimateFeeRate)
                             .BuildTransaction(false);
 
-            var txHash = tx.ToHex();
-
-            var amountPayloadRes = Client.SendCommand("omni_createpayload_simplesend", PropertyId, amount.ToString());
-            var amountPayload = amountPayloadRes.Result.ToString();
-
-            var opreturnRes = Client.SendCommand("omni_createrawtx_opreturn", txHash, amountPayload);
-            var opreturn = opreturnRes.Result.ToString();
-
-            var receiveRefRes = Client.SendCommand("omni_createrawtx_reference", opreturn, toAddress);
-            var receiveRef = receiveRefRes.Result.ToString();
+            var detail = tx.ToString();
+            
+            var amountPayload = await this.CreatePayloadSimpleSend(amount);
+            var opreturn = await this.GenerateOpRetrun(tx.ToHex(), amountPayload);
+            var receiveRef = await this.GenerateReference(opreturn, toAddress);
 
             var finalTx = Transaction.Parse(receiveRef, network);
 
