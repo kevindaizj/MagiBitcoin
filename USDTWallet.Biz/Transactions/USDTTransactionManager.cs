@@ -27,34 +27,39 @@ namespace USDTWallet.Biz.Transactions
             var to = BitcoinAddress.Create(transferInfo.ToAddress, network);
             var change = BitcoinAddress.Create(transferInfo.FeeAddress, network);
 
-            var allUnspentCoins = await BTCOperator.Instance.ListUnspentAsync(transferInfo.FeeAddress);
+            var feeUnspentCoins = await BTCOperator.Instance.ListUnspentAsync(transferInfo.FeeAddress);
 
 
-            var totalBTC = new Money(minFee.Satoshi);
+            var totalBTC = Money.Parse("0");
             var coinAmount = Money.Parse("0");
 
+            TransactionBuilder builder = null;
             Transaction tx = null;
             List<Coin> coins = null;
             Money fee = null;
 
-            while (totalBTC > coinAmount)
+            do
             {
-                coins = BTCOperator.Instance.SelectCoinsToSpent(allUnspentCoins, totalBTC);
-                coins.Add(fromSpentCoin);
-                
-                tx = await USDTOperator.Instance.BuildUnsignedTx(transferInfo.FromAddress, transferInfo.ToAddress, transferInfo.FeeAddress,
-                                                        transferInfo.Amount, transferInfo.EstimateFeeRate, coins);
+                builder = network.CreateTransactionBuilder();
 
-                var builder = network.CreateTransactionBuilder();
+                coins = BTCOperator.Instance.SelectCoinsToSpent(feeUnspentCoins, totalBTC);
+                coins.Add(fromSpentCoin);
+
+                tx = await this.BuildUnsignedTx(builder, transferInfo.FromAddress, transferInfo.ToAddress, transferInfo.FeeAddress,
+                                                minFee, transferInfo.Amount, coins);
+
                 var size = builder.EstimateSize(tx);
                 var feeAmount = size * transferInfo.EstimateFeeRate.SatoshiPerByte;
                 fee = new Money(feeAmount, MoneyUnit.Satoshi);
 
-                totalBTC = fee;
+                totalBTC = minFee + fee;
                 coinAmount = coins.Select(o => o.Amount).Sum();
+
             }
-
-
+            while (totalBTC > coinAmount);
+            
+            builder.SendFees(fee);
+            tx = builder.BuildTransaction(false);
 
             var result = new UnsignTransactionResult
             {
@@ -67,6 +72,30 @@ namespace USDTWallet.Biz.Transactions
         }
 
 
-        
+        public async Task<Transaction> BuildUnsignedTx(TransactionBuilder builder, string fromAddress, string toAddress, string changeAddress, 
+                                                       Money btcAmount, Money usdtAmount, List<Coin> spentCoins)
+        {
+            var network = NetworkOperator.Instance.Network;
+            var to = BitcoinAddress.Create(toAddress, network);
+            var change = BitcoinAddress.Create(changeAddress, network);
+            
+            var tx = builder.AddCoins(spentCoins)
+                            .Send(to, btcAmount)
+                            .SetChange(change)
+                            .BuildTransaction(false);
+
+            var detail = tx.ToString();
+
+            var amountPayload = await USDTOperator.Instance.CreatePayloadSimpleSend(usdtAmount);
+            var opreturn = await USDTOperator.Instance.GenerateOpRetrun(tx.ToHex(), amountPayload);
+            var receiveRef = await USDTOperator.Instance.GenerateReference(opreturn, toAddress);
+
+            var finalTx = Transaction.Parse(receiveRef, network);
+
+            return finalTx;
+        }
+
+
+
     }
 }

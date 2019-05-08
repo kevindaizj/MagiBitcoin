@@ -25,14 +25,15 @@ namespace USDTWallet.Biz.Transactions
             var total = transferInfo.Amount;
             var coinAmount = Money.Parse("0");
 
+            TransactionBuilder builder = null;
             Transaction tx = null;
             List<Coin> coins = null;
             Money fee = null;
 
-            while (total > coinAmount)
+            do
             {
                 coins = BTCOperator.Instance.SelectCoinsToSpent(allUnspentCoins, total);
-                var builder = network.CreateTransactionBuilder();
+                builder = network.CreateTransactionBuilder();
                 tx = builder.AddCoins(coins)
                                 .Send(to, transferInfo.Amount)
                                 .SetChange(change)
@@ -41,12 +42,14 @@ namespace USDTWallet.Biz.Transactions
                 var size = builder.EstimateSize(tx);
                 var feeAmount = size * transferInfo.EstimateFeeRate.SatoshiPerByte;
                 fee = new Money(feeAmount, MoneyUnit.Satoshi);
-
+               
                 total = transferInfo.Amount + fee;
                 coinAmount = coins.Select(o => o.Amount).Sum();
             }
+            while (total > coinAmount);
 
-
+            builder.SendFees(fee);
+            tx = builder.BuildTransaction(false);
 
             var result = new UnsignTransactionResult
             {

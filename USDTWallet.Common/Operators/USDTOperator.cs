@@ -22,7 +22,7 @@ namespace USDTWallet.Common.Operators
 
         public static readonly UInt64 PropertyId = 2147483651;
 
-        public static readonly decimal MinTxFee = 0.0000546M;
+        public static readonly decimal MinTxFee = 0.00000546M;
 
         private USDTOperator()
         {
