@@ -89,6 +89,7 @@
     <Compile Include="Models\Addresses\AddressCategorySelectItem.cs" />
     <Compile Include="Models\Addresses\AddressInfo.cs" />
     <Compile Include="Models\Addresses\AddressVM.cs" />
+    <Compile Include="Models\FeeRates\FeeRateResult.cs" />
     <Compile Include="Models\Mnemonics\MnemonicResult.cs" />
     <Compile Include="Models\Transactions\UnsignedTxJoint.cs" />
     <Compile Include="Models\Transactions\UnsignTransactionResult.cs" />

@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using NBitcoin;
+using NBitcoin.JsonConverters;
 using USDTWallet.Biz.Common;
 using USDTWallet.Common.Exceptions;
 using USDTWallet.Common.Helpers;
 using USDTWallet.Common.Operators;
 using USDTWallet.Dao.Address;
 using USDTWallet.Dao.Wallet;
+using USDTWallet.Models.Models.FeeRates;
 
 namespace USDTWallet.Biz.Transactions
 {
@@ -62,5 +65,22 @@ namespace USDTWallet.Biz.Transactions
 
             return privateKeys;
         }
+
+
+        public async Task<FeeRate> GetFeeRate()
+        {
+            using (var client = new HttpClient())
+            {
+                //https://bitcoinfees.21.co/api/v1/fees/recommended  （打不开）
+                const string request = @"https://bitcoinfees.earn.com/api/v1/fees/recommended";
+                var resp = await client.GetAsync(request, HttpCompletionOption.ResponseContentRead);
+                string json = await resp.Content.ReadAsStringAsync();
+                var result = Serializer.ToObject<FeeRateResult>(json);
+
+                var money = new Money(result.fastestFee, MoneyUnit.Satoshi);
+                return new FeeRate(money);
+            }
+        }
+
     }
 }

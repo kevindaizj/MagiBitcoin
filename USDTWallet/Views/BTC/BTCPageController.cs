@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using USDTWallet.Biz.Addresses;
+using USDTWallet.Biz.Transactions;
 using USDTWallet.Common;
 using USDTWallet.Common.Helpers;
 using USDTWallet.Common.Operators;
@@ -73,13 +74,16 @@ namespace USDTWallet.Views.BTC
 
         private AddressManager AddressManager { get; set; }
 
+        private TransactionManager TxManager { get; set; }
 
-        public BTCPageController(IEventAggregator eventAggregator, MessageBoxService msgBox, AddressManager addressManager)
+        public BTCPageController(IEventAggregator eventAggregator, MessageBoxService msgBox,
+                                AddressManager addressManager, TransactionManager txManager)
         {
             MessageBoxService = msgBox;
             this.TransferInfo = new BTCTransferVM();
 
             this.AddressManager = addressManager;
+            this.TxManager = txManager;
 
             this.OnFromAddressChanged = new DelegateCommand(async () => await GetBalance());
             this.GenerateTransactionCommand = new DelegateCommand(GenerateUnsignedTransaction);
@@ -132,7 +136,7 @@ namespace USDTWallet.Views.BTC
         private async void EstimateFeeRate()
         {
             EstFeeBtnContent = "估算中...";
-            TransferInfo.EstimateFeeRate = await BTCOperator.Instance.EstimateFeeRate();
+            TransferInfo.EstimateFeeRate = await TxManager.GetFeeRate();
             EstFeeBtnContent = "估算";
         }
 
