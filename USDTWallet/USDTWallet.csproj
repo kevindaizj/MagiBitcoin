@@ -207,6 +207,10 @@
       <DependentUpon>SignBTCTransaction.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Popups\Transactions\SignBTCTransactionController.cs" />
+    <Compile Include="Views\Popups\Transactions\SignUSDTTransaction.xaml.cs">
+      <DependentUpon>SignUSDTTransaction.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Popups\Transactions\SignUSDTTransactionController.cs" />
     <Compile Include="Views\Popups\Wallets\CreateWallet.xaml.cs">
       <DependentUpon>CreateWallet.xaml</DependentUpon>
     </Compile>
@@ -264,6 +268,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Popups\Transactions\SignBTCTransaction.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Popups\Transactions\SignUSDTTransaction.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

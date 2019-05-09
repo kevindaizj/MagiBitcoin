@@ -154,14 +154,23 @@ namespace USDTWallet.Common.Operators
             return Transaction.Parse(txHex, NetworkOperator.Instance.Network);
         }
         
-        public async Task SignAndSendTransactionByPrivateKey(string privKey, string transactionHex, List<Coin> spentCoins)
+        public async Task SignAndSendTransactionByPrivateKey(List<string> privKeys, string transactionHex, List<Coin> spentCoins)
         {
             var network = NetworkOperator.Instance.Network;
-            var privateKey = Key.Parse(privKey, network);
             var tx = Transaction.Parse(transactionHex, network);
-            tx.Sign(privateKey, spentCoins.ToArray());
+
+            var secrets = new List<BitcoinSecret>();
+            foreach (var pk in privKeys)
+            {
+                var key = Key.Parse(pk, network);
+                var secret = key.GetBitcoinSecret(network);
+                secrets.Add(secret);
+            }
+
+            tx.Sign(secrets.ToArray(), spentCoins.ToArray());
 
             var a = tx.ToString();
+            var status = tx.Check();
 
             await Client.SendRawTransactionAsync(tx);
         }

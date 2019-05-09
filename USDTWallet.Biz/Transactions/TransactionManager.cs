@@ -26,22 +26,41 @@ namespace USDTWallet.Biz.Transactions
 
         public async Task SignAndSendTransaction(string password, string transactionHex, List<Coin> spentCoins)
         {
+            var privKeyWifs = this.GetPrivateKeys(password, spentCoins).Take(1).ToList();
+            await BTCOperator.Instance.SignAndSendTransactionByPrivateKey(privKeyWifs, transactionHex, spentCoins);
+        }
+
+        public async Task SignAndSendUSDTTransaction(string password, string transactionHex, List<Coin> spentCoins)
+        {
+            var privKeyWifs = this.GetPrivateKeys(password, spentCoins);
+            await BTCOperator.Instance.SignAndSendTransactionByPrivateKey(privKeyWifs, transactionHex, spentCoins);
+        }
+
+
+        public List<string> GetPrivateKeys(string password, List<Coin> spentCoins)
+        {
             var wallet = WalletDao.GetWalletById(CurrentWallet.Id);
             if (MD5Helper.ToMD5(password) != wallet.Password)
                 throw new WTException(ExceptionCode.WrongWalletPassword, "密码错误");
 
             var network = NetworkOperator.Instance.Network;
-            var address = spentCoins.Select(o => o.ScriptPubKey.GetDestinationAddress(network).ToString()).First();
-            var addressInfo = AddressDao.GetByAddress(CurrentWallet.Id, address);
-            if (null == addressInfo)
+            var addresses = spentCoins.Select(o => o.ScriptPubKey.GetDestinationAddress(network).ToString()).Distinct().ToList();
+            var addressInfos = AddressDao.GetByAddresses(CurrentWallet.Id, addresses);
+            if (addressInfos.Count == 0 || addressInfos.Count != addresses.Count)
                 throw new WTException(ExceptionCode.AddressNotExisted, "当前钱包找不到相关比特币地址");
 
-            var keyPath = new KeyPath(addressInfo.KeyPath);
-            var rootXPrivKey = ExtKey.Parse(CurrentWallet.RootXPrivKey, network);
-            var xPrivKey = rootXPrivKey.Derive(keyPath);
-            var privKeyWif = xPrivKey.PrivateKey.GetWif(network).ToString();
+            var privateKeys = new List<string>();
 
-            await BTCOperator.Instance.SignAndSendTransactionByPrivateKey(privKeyWif, transactionHex, spentCoins);
+            foreach (var addr in addressInfos)
+            {
+                var keyPath = new KeyPath(addr.KeyPath);
+                var rootXPrivKey = ExtKey.Parse(CurrentWallet.RootXPrivKey, network);
+                var xPrivKey = rootXPrivKey.Derive(keyPath);
+                var privKeyWif = xPrivKey.PrivateKey.GetWif(network).ToString();
+                privateKeys.Add(privKeyWif);
+            }
+
+            return privateKeys;
         }
     }
 }

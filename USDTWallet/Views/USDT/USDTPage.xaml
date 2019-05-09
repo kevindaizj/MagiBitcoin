@@ -153,7 +153,7 @@
             </prism:PopupWindowAction>
         </prism:InteractionRequestTrigger>
         <prism:InteractionRequestTrigger SourceObject="{Binding SignTransactionPopupRequest}">
-            <prism:PopupWindowAction IsModal="True" CenterOverAssociatedObject="True" WindowContentType="{x:Type popup:SignBTCTransaction}">
+            <prism:PopupWindowAction IsModal="True" CenterOverAssociatedObject="True" WindowContentType="{x:Type popup:SignUSDTTransaction}">
             </prism:PopupWindowAction>
         </prism:InteractionRequestTrigger>
     </i:Interaction.Triggers>

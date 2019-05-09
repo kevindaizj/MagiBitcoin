@@ -12,13 +12,11 @@ using USDTWallet.Common;
 using USDTWallet.Common.Helpers;
 using USDTWallet.Common.Operators;
 using USDTWallet.Models.Models.Transactions;
-using USDTWallet.PopupNotifications;
 
 namespace USDTWallet.Views.Popups.Transactions
 {
-    public class SignBTCTransactionController : ControllerBase, IInteractionRequestAware
+    public class SignUSDTTransactionController : ControllerBase, IInteractionRequestAware
     {
-        
         private string _txJson;
         public string TxJson
         {
@@ -38,6 +36,13 @@ namespace USDTWallet.Views.Popups.Transactions
         {
             get { return _privKey; }
             set { SetProperty(ref _privKey, value); }
+        }
+
+        private string _feePrivKey;
+        public string FeePrivKey
+        {
+            get { return _feePrivKey; }
+            set { SetProperty(ref _feePrivKey, value); }
         }
 
         private bool _pwdMethod = true;
@@ -75,7 +80,7 @@ namespace USDTWallet.Views.Popups.Transactions
 
         private TransactionManager TxManager { get; set; }
 
-        public SignBTCTransactionController(TransactionManager txManager)
+        public SignUSDTTransactionController(TransactionManager txManager)
         {
             this.TxManager = txManager;
             this.SendCommand = new DelegateCommand(SignAndSendTx);
@@ -95,18 +100,18 @@ namespace USDTWallet.Views.Popups.Transactions
             if ((PwdMethod && Password == null) || (PrivKeyMethod && string.IsNullOrWhiteSpace(PrivKey)))
                 return;
 
-            if(PwdMethod)
+            if (PwdMethod)
             {
                 var pwd = SecureStringHelper.SecureStringToString(Password);
-                await TxManager.SignAndSendTransaction(pwd, this.Transaction.ToHex(), this.SpentCoins);
+                await TxManager.SignAndSendUSDTTransaction(pwd, this.Transaction.ToHex(), this.SpentCoins);
             }
             else
             {
-                var keys = new List<string> { PrivKey };
+                var keys = new List<string> { PrivKey, FeePrivKey };
                 await BTCOperator.Instance.SignAndSendTransactionByPrivateKey(keys, this.Transaction.ToHex(), this.SpentCoins);
             }
 
-            
+
             this.FinishInteraction?.Invoke();
         }
     }

@@ -76,6 +76,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CoinSelectors\AllCoinSelector.cs" />
+    <Compile Include="CoinSelectors\USDTCoinSelector.cs" />
     <Compile Include="Exceptions\ExceptionCode.cs" />
     <Compile Include="Exceptions\WTException.cs" />
     <Compile Include="Gloabal\GlobalWallet.cs" />

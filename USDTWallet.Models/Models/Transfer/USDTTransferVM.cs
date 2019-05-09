@@ -12,7 +12,7 @@ namespace USDTWallet.Models.Models.Transfer
 {
     public class USDTTransferVM : ViewModelBase
     {
-        private string _from;
+        private string _from = "mtYpuP45hjDBgFuYfRmeG7i63QYQCwSuPN";
 
         [Required(ErrorMessage = "发送地址不能为空")]
         [RegularExpression("[^OIl0]{25,34}$", ErrorMessage = "地址格式不正确")]
@@ -22,7 +22,7 @@ namespace USDTWallet.Models.Models.Transfer
             set { this.SetProperty(ref _from, value); }
         }
 
-        private string _to;
+        private string _to = "n3uXG3c3ouZUtVZUbzCZCQomAguGxdwQcQ";
 
         [Required(ErrorMessage = "接收地址不能为空")]
         [RegularExpression("[^OIl0]{25,34}$", ErrorMessage = "地址格式不正确")]
@@ -34,7 +34,7 @@ namespace USDTWallet.Models.Models.Transfer
         }
 
 
-        private string _feeAddr;
+        private string _feeAddr = "mm2PNN7Ybj2MajV9oai8eWBaD2KhAjMEBS";
 
         [Required(ErrorMessage = "付手续费地址不能为空")]
         [RegularExpression("[^OIl0]{25,34}$", ErrorMessage = "地址格式不正确")]
@@ -45,7 +45,7 @@ namespace USDTWallet.Models.Models.Transfer
         }
 
 
-        private Money _amount;
+        private Money _amount = Money.Parse("1000");
 
         [Required(ErrorMessage = "金额不能为空")]
         [MoneyCompare("BalanceOf", Operator = MoneyCompareAttribute.CompareOperator.LessThanOrEqual, ErrorMessage = "转账金额不允许超过账户余额")]
@@ -80,7 +80,7 @@ namespace USDTWallet.Models.Models.Transfer
         }
 
 
-        private FeeRate _feeRate;
+        private FeeRate _feeRate = new FeeRate(Money.Parse("0.1"));
         public FeeRate EstimateFeeRate
         {
             get { return _feeRate; }
