@@ -186,9 +186,9 @@ namespace USDTWallet.Views.Home
             var usdtBalanceDict = await AddressManager.BatchGetUSDTBalanceViaNode(addressList);
             var balanceDict = new Dictionary<string, Money>();
 
-            await Task.Run(() =>
+            await Task.Run(async () =>
             {
-                balanceDict = AddressManager.BatchGetBTCBalanceViaNode(addressList);
+                balanceDict = await AddressManager.BatchGetBTCBalanceViaNode(addressList);
             });
             
 

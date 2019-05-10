@@ -1,11 +1,14 @@
 ﻿using NBitcoin;
+using NBitcoin.DataEncoders;
 using NBitcoin.RPC;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using USDTWallet.Models.Models.Transfer;
 using USDTWallet.Models.Models.USDT;
 
 namespace USDTWallet.Common.Operators
@@ -85,6 +88,41 @@ namespace USDTWallet.Common.Operators
             var finalTx = Transaction.Parse(receiveRef, network);
 
             return finalTx;
+        }
+
+
+        public USDTOpReturnInfo ConvertOpReturnTxOut(TxOut opReturnOutput)
+        {
+            var script = opReturnOutput.ScriptPubKey.ToString();
+            var opcode = "OP_RETURN";
+            var omniAscii = "6f6d6e69";
+            var starter = opcode + " " + omniAscii;
+
+            if (!script.StartsWith(starter))
+                return null;
+
+            var code = script.Substring(starter.Length);
+            int index = 0;
+
+            var version = code.Substring(index, 4);
+            index += 4;
+
+            var type = code.Substring(index, 4);
+            index += 4;
+
+            var currencyId = code.Substring(index, 8);
+            index += 8;
+
+            var amount = code.Substring(index);
+            var amountDec = UInt64.Parse(amount, NumberStyles.HexNumber);
+
+            return new USDTOpReturnInfo
+            {
+                TransactionVersion = uint.Parse(version, NumberStyles.HexNumber),
+                TransactionType = uint.Parse(type, NumberStyles.HexNumber),
+                CurrencyIdentifier = uint.Parse(currencyId, NumberStyles.HexNumber),
+                Amount = new Money(amountDec, MoneyUnit.Satoshi)
+            };
         }
 
     }

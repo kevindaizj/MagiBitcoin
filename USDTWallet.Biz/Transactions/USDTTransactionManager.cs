@@ -60,18 +60,12 @@ namespace USDTWallet.Biz.Transactions
             while (totalBTC > coinAmount);
 
             var opReturnOutput = tx.Outputs.Single(o => o.ScriptPubKey.ToString().StartsWith("OP_RETURN"));
-
-            //builder = network.CreateTransactionBuilder();
-            //tx = builder.ContinueToBuild(tx)
-            //            //.AddCoins(coins)
-            //            .SetChange(change)
-            //            .SendFees(fee)
-            //            .BuildTransaction(false);
+            
             builder.SetCoinSelector(new AllCoinSelector());
             builder.AddCoins(coins).SendFees(fee);
             tx = builder.BuildTransaction(false);
 
-            tx.Outputs.Add(opReturnOutput);
+            tx.Outputs.Insert(1, opReturnOutput);
             var sssize = builder.EstimateSize(tx);
 
             var result = new UnsignTransactionResult
@@ -96,9 +90,6 @@ namespace USDTWallet.Biz.Transactions
                             .AddCoins(feeCoins)
                             .Send(to, btcAmount)
                             .SetChange(feeAddr)
-                            //.Then()
-                            //.AddCoins(feeCoins)
-                            //.SetChange(feeAddr)
                             .SetCoinSelector(new USDTCoinSelector(fromCoin.Outpoint))
                             .BuildTransaction(false);
 
@@ -110,18 +101,6 @@ namespace USDTWallet.Biz.Transactions
 
             var finalTx = Transaction.Parse(receiveRef, network);
             this.KeepDustOutputUnique(finalTx);
-            //foreach(var c in feeCoins)
-            //{
-            //    finalTx.Inputs.Add(new TxIn(c.Outpoint));
-            //}
-
-            //var clone = finalTx.Clone();
-            //finalTx.Outputs.Clear();
-            //foreach (var ot in clone.Outputs)
-            //{
-            //    if (!finalTx.Outputs.Any(o => o.Value == ot.Value && o.ScriptPubKey == ot.ScriptPubKey))
-            //        finalTx.Outputs.Add(ot);
-            //}
 
             var finalDetail = finalTx.ToString();
 
@@ -131,23 +110,28 @@ namespace USDTWallet.Biz.Transactions
 
         private void KeepDustOutputUnique(Transaction tx)
         {
-            TxOut outpoint = null;
+            var dust = new Money(USDTOperator.SentBTCPerTx, MoneyUnit.BTC);
 
-            var original = tx.Clone().Outputs;
+            var dupIndexs = new List<uint>();
+            for(uint i = 0; i < tx.Outputs.Count; i++)
+            {
+                if (tx.Outputs[i].Value == dust)
+                    dupIndexs.Add(i);
+            }
+
+            if (dupIndexs.Count > 0)
+                dupIndexs.RemoveAt(dupIndexs.Count - 1);
+
+            var originalOutputs = tx.Clone().Outputs;
             tx.Outputs.Clear();
 
-            foreach(var outp in original)
+            for(uint i = 0; i < originalOutputs.Count; i++)
             {
-                if (null != outpoint)
-                {
-                    if (outp.ScriptPubKey == outpoint.ScriptPubKey && outp.Value == outpoint.Value)
-                        continue;
-                }
+                if (dupIndexs.Any(idx => idx == i))
+                    continue;
 
-                if (outp.Value == new Money(USDTOperator.SentBTCPerTx, MoneyUnit.BTC))
-                    outpoint = outp;
-
-                tx.Outputs.Add(outp);
+                var output = originalOutputs[i];
+                tx.Outputs.Add(output);
             }
         }
 

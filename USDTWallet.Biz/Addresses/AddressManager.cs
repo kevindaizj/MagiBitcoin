@@ -176,7 +176,27 @@ namespace USDTWallet.Biz.Addresses
         }
 
 
-        public Dictionary<string, Money> BatchGetBTCBalanceViaNode(List<string> addressList)
+        public async Task<Dictionary<string, Money>> BatchGetBTCBalanceViaNode(List<string> addressList)
+        {
+            var result = new Dictionary<string, Money>();
+
+            try
+            {
+                foreach(var addr in addressList)
+                {
+                    var balance = await BTCOperator.Instance.GetBalanceByAddress(addr);
+                    result.Add(addr, balance);
+                }
+            }
+            catch (Exception)
+            {
+
+            }
+
+            return result;
+        }
+
+        public Dictionary<string, Money> BatchGetBTCBalanceViaNode2(List<string> addressList)
         {
             var result = new Dictionary<string, Money>();
 
