@@ -1,4 +1,5 @@
 ﻿using NBitcoin;
+using NBitcoin.DataEncoders;
 using NBitcoin.JsonConverters;
 using NBitcoin.RPC;
 using System;
@@ -48,14 +49,21 @@ namespace USDTWallet.Common.Operators
             return balance;
         }
 
-        public async Task<Money> GetBalanceByAddress(string address)
+        public async Task<Money> GetBalanceByAddress(string address, int minConf = 1)
         {
-            var addr = BitcoinAddress.Create(address, NetworkOperator.Instance.Network);
-            var unspentList = await Client.ListUnspentAsync(0, int.MaxValue, addr);
+            var unspentList = await this.ListUnspentAsync(address, minConf);
             return unspentList.Select(o => o.Amount).Sum();
         }
 
-        
+
+        public async Task<List<UnspentCoin>> ListUnspentAsync(string address, int minConf = 1)
+        {
+            var addr = BitcoinAddress.Create(address, NetworkOperator.Instance.Network);
+            var unspentList = await Client.ListUnspentAsync(minConf, int.MaxValue, addr);
+            return unspentList.ToList();
+        }
+
+
         public async Task<FeeRate> EstimateFeeRate()
         {
             try
@@ -70,15 +78,7 @@ namespace USDTWallet.Common.Operators
             }
 
         }
-
-
-        public async Task<List<UnspentCoin>> ListUnspentAsync(string address)
-        {
-            var addr = BitcoinAddress.Create(address, NetworkOperator.Instance.Network);
-            var unspentList = await Client.ListUnspentAsync(0, int.MaxValue, addr);
-            return unspentList.ToList();
-        }
-
+        
 
         public List<Coin> SelectCoinsToSpent(List<UnspentCoin> unspentCoins, Money totalAmount)
         {
@@ -261,6 +261,49 @@ namespace USDTWallet.Common.Operators
             }
         }
 
+        public async Task<List<CustomRawTransactionInfo>> GetTxIdsFromMempool()
+        {
+            var txIds = Client.GetRawMempool();
+            var txs = new List<CustomRawTransactionInfo>();
+            foreach(var txId in txIds)
+            {
+                var tx = await GetRawTransactionInfoAsync(txId);
+                txs.Add(tx);
+            }
+
+            return txs;
+        }
+
+
+        public async Task<CustomRawTransactionInfo> GetRawTransactionInfoAsync(uint256 txId)
+        {
+            var request = new RPCRequest(RPCOperations.getrawtransaction, new object[] { txId, 1 });
+            var response = await Client.SendCommandAsync(request);
+            var json = response.Result;
+
+            return new CustomRawTransactionInfo
+            {
+                Transaction = ParseTxHex(json.Value<string>("hex")),
+                TransactionId = uint256.Parse(json.Value<string>("txid")),
+                TransactionTime = json["time"] != null ? NBitcoin.Utils.UnixTimeToDateTime(json.Value<long>("time")) : (DateTimeOffset?)null,
+                Hash = uint256.Parse(json.Value<string>("hash")),
+                Size = json.Value<uint>("size"),
+                VirtualSize = json.Value<uint>("vsize"),
+                Version = json.Value<uint>("version"),
+                LockTime = new LockTime(json.Value<uint>("locktime")),
+                BlockHash = json["blockhash"] != null ? uint256.Parse(json.Value<string>("blockhash")) : null,
+                Confirmations = json.Value<uint>("confirmations"),
+                BlockTime = json["blocktime"] != null ? NBitcoin.Utils.UnixTimeToDateTime(json.Value<long>("blocktime")) : (DateTimeOffset?)null
+            };
+        }
+
+        private Transaction ParseTxHex(string hex)
+        {
+            var tx = NetworkOperator.Instance.Network.Consensus.ConsensusFactory.CreateTransaction();
+            tx.ReadWrite(Encoders.Hex.DecodeData(hex), NetworkOperator.Instance.Network);
+            return tx;
+        }
 
     }
+
 }

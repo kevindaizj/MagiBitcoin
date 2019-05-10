@@ -76,9 +76,8 @@ namespace USDTWallet.Biz.Transactions
                 var resp = await client.GetAsync(request, HttpCompletionOption.ResponseContentRead);
                 string json = await resp.Content.ReadAsStringAsync();
                 var result = Serializer.ToObject<FeeRateResult>(json);
-
-                var money = new Money(result.fastestFee, MoneyUnit.Satoshi);
-                return new FeeRate(money);
+                
+                return new FeeRate((decimal)result.fastestFee);
             }
         }
 

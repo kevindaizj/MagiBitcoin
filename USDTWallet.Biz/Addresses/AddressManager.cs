@@ -182,12 +182,29 @@ namespace USDTWallet.Biz.Addresses
 
             try
             {
-                var group = BTCOperator.Instance.ListAddressGroupings();
+                var groupings = BTCOperator.Instance.ListAddressGroupings();
+                var groupDict = new Dictionary<string, Money>();
+
+                foreach (var group in groupings)
+                {
+                    if (group.ChangeAddresses.Count > 0)
+                    {
+                        foreach(var change in group.ChangeAddresses)
+                        {
+                            groupDict.Add(change.Address.ToString(), change.Amount);
+                        }
+                    }
+                    else
+                    {
+                        groupDict.Add(group.PublicAddress.ToString(), group.Amount);
+                    }
+                }
+
+
                 foreach (var address in addressList)
                 {
-                    var g = group.SingleOrDefault(q => q.PublicAddress.ToString() == address);
-                    Money balance = null != g ? g.Amount : Money.Parse("0");
-                    result.Add(address, balance);
+                    var balance = groupDict.ContainsKey(address) ? groupDict[address] : null;
+                    result.Add(address, balance ?? Money.Parse("0"));
                 }
             }
             catch(Exception)

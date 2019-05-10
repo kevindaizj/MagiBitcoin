@@ -86,11 +86,14 @@
     <Compile Include="Enums\Address\CustomAddressType.cs" />
     <Compile Include="Enums\Network\CustomNetworkType.cs" />
     <Compile Include="Models\Accounts\AccountVM.cs" />
+    <Compile Include="Models\Addresses\AddressBalancePair.cs" />
     <Compile Include="Models\Addresses\AddressCategorySelectItem.cs" />
     <Compile Include="Models\Addresses\AddressInfo.cs" />
     <Compile Include="Models\Addresses\AddressVM.cs" />
     <Compile Include="Models\FeeRates\FeeRateResult.cs" />
     <Compile Include="Models\Mnemonics\MnemonicResult.cs" />
+    <Compile Include="Models\Transactions\CustomRawTransactionInfo.cs" />
+    <Compile Include="Models\Transactions\MempoolTxItem.cs" />
     <Compile Include="Models\Transactions\UnsignedTxJoint.cs" />
     <Compile Include="Models\Transactions\UnsignTransactionResult.cs" />
     <Compile Include="Models\Transfer\BTCTransferVM.cs" />
