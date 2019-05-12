@@ -215,6 +215,10 @@
       <DependentUpon>SignUSDTTransaction.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Popups\Transactions\SignUSDTTransactionController.cs" />
+    <Compile Include="Views\Popups\Transactions\TransactionDetailPopupController.cs" />
+    <Compile Include="Views\Popups\Transactions\TransactionDetailPopup.xaml.cs">
+      <DependentUpon>TransactionDetailPopup.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Popups\Wallets\CreateWallet.xaml.cs">
       <DependentUpon>CreateWallet.xaml</DependentUpon>
     </Compile>
@@ -223,6 +227,10 @@
       <DependentUpon>LoginWallet.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Popups\Wallets\LoginWalletController.cs" />
+    <Compile Include="Views\TransactionOverview\TransactionOverviewPage.xaml.cs">
+      <DependentUpon>TransactionOverviewPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\TransactionOverview\TransactionOverviewPageController.cs" />
     <Compile Include="Views\USDT\USDTPage.xaml.cs">
       <DependentUpon>USDTPage.xaml</DependentUpon>
     </Compile>
@@ -283,11 +291,23 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\Popups\Transactions\TransactionDetailPopup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Popups\Transactions\TransactionDetailPopupStyle.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\Popups\Wallets\CreateWallet.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Popups\Wallets\LoginWallet.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\TransactionOverview\TransactionOverviewPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -310,6 +330,8 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Resource Include="Images\copy.png" />
+    <Resource Include="Images\token_tx.png" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

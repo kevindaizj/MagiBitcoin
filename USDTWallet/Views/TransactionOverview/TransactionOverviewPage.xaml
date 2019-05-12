@@ -1,0 +1,120 @@
+﻿<UserControl x:Class="USDTWallet.Views.TransactionOverview.TransactionOverviewPage"
+            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:prism="http://prismlibrary.com/"       
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:popup ="clr-namespace:USDTWallet.Views.Popups.Transactions"
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <StackPanel Margin="28 27">
+            <StackPanel Margin="0 40 0 30">
+                <TextBlock FontSize="20" Margin="0 5 0 0" Foreground="#333333">最近的Transaction</TextBlock>
+                <StackPanel Margin="0 10 20 10">
+
+                    <StackPanel Orientation="Horizontal" Margin="0 41" HorizontalAlignment="Center" Visibility="{Binding AnyTransactions, Converter={StaticResource InverseBoolToVisibility}}">
+                        <Image VerticalAlignment="Center" Source="/Images/cry_face.png" />
+                        <TextBlock Foreground="#858585" FontSize="14" VerticalAlignment="Center" Margin="10 0">暂无Transaction相关记录</TextBlock>
+                    </StackPanel>
+
+                    <ListView ItemsSource="{Binding TransactionList}" ItemContainerStyle="{StaticResource TransactionItemStyle}" ScrollViewer.VerticalScrollBarVisibility="Visible"
+                        BorderThickness="0 0 0 0" Background="Transparent" FontWeight="Normal" Visibility="{Binding AnyTransactions, Converter={StaticResource BoolToVisibility}}"
+                        Template="{StaticResource NoScrollList}">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Background="Transparent">
+                                    <Grid.InputBindings>
+                                        <MouseBinding MouseAction="LeftClick" Command="{Binding DataContext.TransactionDetailCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                            CommandParameter="{Binding TransactionId}" />
+                                    </Grid.InputBindings>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="120"></ColumnDefinition>
+                                        <ColumnDefinition Width="130"></ColumnDefinition>
+                                        <ColumnDefinition Width="4*"></ColumnDefinition>
+                                        <ColumnDefinition Width="3*"></ColumnDefinition>
+                                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10 0">
+                                        <Border Width="90" Height="24" Padding="8 3" CornerRadius="2" Background="#FF7700" Visibility="{Binding IsConfirmed, Converter={StaticResource InverseBoolToVisibility}}" >
+                                            <TextBlock FontSize="12" Foreground="#FFF" FontWeight="Bold" TextAlignment="Center" Text="等待确认" />
+                                        </Border>
+                                        <Border Width="90" Height="24" Padding="8 3" CornerRadius="2" Background="#00D55F" Visibility="{Binding IsConfirmed, Converter={StaticResource BoolToVisibility}}" >
+                                            <TextBlock FontSize="12" Foreground="#FFF" FontWeight="Bold" TextAlignment="Center" Text="已确认" />
+                                        </Border>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10 0">
+                                        <TextBlock FontSize="14" Foreground="#333333" TextAlignment="Center" Text="{Binding CreateDate, StringFormat={}{0:yyyy-MM-dd}}"
+                                            />
+                                        <TextBlock FontSize="14" Foreground="#333333" TextAlignment="Center" Text="{Binding CreateDate, StringFormat={}{0:HH:mm}}"
+                                            />
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="20 6">
+                                        <WrapPanel>
+                                            <Border Margin="0 0 6 0" Background="#5B78F3" Width="58" Height="20" Padding="10 1" CornerRadius="10">
+                                                <TextBlock TextAlignment="Center" FontSize="12" Foreground="#FFF" FontWeight="Bold">FROM</TextBlock>
+                                            </Border>
+                                            <StackPanel>
+                                                <TextBlock FontSize="12" Margin="0 3 0 0" Foreground="#858585" Text="{Binding FromAddress}"
+                                                    />
+                                                <!--<StackPanel Orientation="Horizontal" Visibility="{Binding FromAccountName, Converter={StaticResource InverseNullBoolToVisibility}}">
+                                                    <TextBlock FontSize="12" Margin="0 3 0 0" Foreground="#004AFF" Text="{Binding FromAccountName}" />
+                                                    <TextBlock FontSize="12" Margin="10 3 0 0" Foreground="#858585" Width="200" TextTrimming="CharacterEllipsis" Text="{Binding From}"
+                                                        />
+                                                </StackPanel>-->
+                                            </StackPanel>
+                                        </WrapPanel>
+                                        <WrapPanel Margin="0 10 0 0">
+                                            <Border Margin="0 0 6 0" Background="#5B78F3" Width="58" Height="20" Padding="10 1" CornerRadius="10">
+                                                <TextBlock TextAlignment="Center" FontSize="12" Foreground="#fff" FontWeight="Bold">TO</TextBlock>
+                                            </Border>
+                                            <StackPanel>
+                                                <TextBlock FontSize="12" Margin="0 3 0 0" Foreground="#858585" Text="{Binding ToAddress}"
+                                                    />
+                                                <!--<StackPanel Orientation="Horizontal" Visibility="{Binding ToAccountName, Converter={StaticResource InverseNullBoolToVisibility}}">
+                                                    <TextBlock FontSize="12" Margin="0 3 0 0" Foreground="#004AFF" Text="{Binding ToAccountName}" />
+                                                    <TextBlock FontSize="12" Margin="10 3 0 0" Foreground="#858585" Width="200" TextTrimming="CharacterEllipsis" Text="{Binding To}"
+                                                        />
+                                                </StackPanel>-->
+                                            </StackPanel>
+                                        </WrapPanel>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left">
+                                        <TextBlock FontSize="18" Foreground="#ff2e66" Text="{Binding Amount, Converter={StaticResource MoneyConverter}}" />
+                                        <TextBlock FontSize="15" Text="BTC" Margin="8 3 0 0" Foreground="#ff2e66" Visibility="{Binding IsBTC, Converter={StaticResource BoolToVisibility}}"
+                                            />
+                                        <TextBlock FontSize="15" Text="USDT" Margin="8 3 0 0" Foreground="#ff2e66" Visibility="{Binding IsBTC, Converter={StaticResource InverseBoolToVisibility}}"
+                                            />
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="4" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0 0 30 0">
+                                        <Border Width="30" Height="30">
+                                            <Image Source="/Images/token_tx.png" Width="20" Height="20" HorizontalAlignment="Right" Visibility="{Binding IsBTC, Converter={StaticResource InverseBoolToVisibility}}" />
+                                        </Border>
+                                    </StackPanel>
+                                </Grid>
+
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+
+    <!-- Popup Triggers -->
+    <i:Interaction.Triggers>
+        <prism:InteractionRequestTrigger SourceObject="{Binding TranactionDetailPopupRequest}">
+            <prism:PopupWindowAction IsModal="True" CenterOverAssociatedObject="True" WindowContentType="{x:Type popup:TransactionDetailPopup}"
+                WindowStartupLocation="CenterScreen">
+            </prism:PopupWindowAction>
+        </prism:InteractionRequestTrigger>
+    </i:Interaction.Triggers>
+
+</UserControl>

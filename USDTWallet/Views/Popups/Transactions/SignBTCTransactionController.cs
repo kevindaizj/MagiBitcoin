@@ -1,5 +1,6 @@
 ﻿using NBitcoin;
 using Prism.Commands;
+using Prism.Events;
 using Prism.Interactivity.InteractionRequest;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ using USDTWallet.Biz.Transactions;
 using USDTWallet.Common;
 using USDTWallet.Common.Helpers;
 using USDTWallet.Common.Operators;
+using USDTWallet.Events;
 using USDTWallet.Models.Models.Transactions;
 using USDTWallet.PopupNotifications;
 
@@ -75,9 +77,12 @@ namespace USDTWallet.Views.Popups.Transactions
 
         private TransactionManager TxManager { get; set; }
 
-        public SignBTCTransactionController(TransactionManager txManager)
+        private IEventAggregator EventAggregator { get; set; }
+
+        public SignBTCTransactionController(TransactionManager txManager, IEventAggregator eventAggregator)
         {
             this.TxManager = txManager;
+            this.EventAggregator = eventAggregator;
             this.SendCommand = new DelegateCommand(SignAndSendTx);
         }
 
@@ -106,7 +111,7 @@ namespace USDTWallet.Views.Popups.Transactions
                 await TxManager.SignAndSendTransactionByPrivateKey(keys, this.Transaction.ToHex(), this.SpentCoins);
             }
 
-            
+            this.EventAggregator.GetEvent<TransactionCreated>().Publish();
             this.FinishInteraction?.Invoke();
         }
     }

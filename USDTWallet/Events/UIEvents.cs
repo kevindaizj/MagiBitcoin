@@ -12,4 +12,6 @@ namespace USDTWallet.Events
     public class CreateAddressSuccessEvent : PubSubEvent<long> { }
 
     public class ChangeNetworkEvent: PubSubEvent { }
+
+    public class TransactionCreated : PubSubEvent { }
 }

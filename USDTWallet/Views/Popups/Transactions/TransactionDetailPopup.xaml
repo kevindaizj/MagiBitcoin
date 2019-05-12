@@ -1,0 +1,161 @@
+﻿<UserControl x:Class="USDTWallet.Views.Popups.Transactions.TransactionDetailPopup"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:USDTWallet.Views.Popups.Transactions"
+             xmlns:prism="http://prismlibrary.com/"
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             mc:Ignorable="d" 
+             d:DesignHeight="950" d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="TransactionDetailPopupStyle.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+
+    <Grid Width="563" Height="748" Background="#FFF">
+
+        <StackPanel Margin="10">
+            <TextBlock FontSize="27" Foreground="#104EFF" Margin="0 20 0 30" TextAlignment="Center" Visibility="{Binding Transaction.IsBTC, Converter={StaticResource BoolToVisibility}}">BTC Transaction</TextBlock>
+            <TextBlock FontSize="25" Foreground="#104EFF" Margin="0 20 0 30" TextAlignment="Center" Visibility="{Binding Transaction.IsBTC, Converter={StaticResource InverseBoolToVisibility}}">USDT Transaction</TextBlock>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10 0" >
+                <TextBlock Text="{Binding Transaction.TransactionId }" FontSize="12" Foreground="#858585" TextAlignment="Center" Width="360" TextTrimming="CharacterEllipsis" />
+                <Image Source="/Images/copy.png" Margin="5 0 0 0" Width="14" Height="14"  Cursor="Hand" >
+                    <Image.InputBindings>
+                        <MouseBinding MouseAction="LeftClick" Command="{Binding CopyTransactionHashCommand}" />
+                    </Image.InputBindings>
+                </Image>
+            </StackPanel>
+
+            <TextBlock Text="{Binding Transaction.CreateDate, StringFormat={}{0:yyyy-MM-dd HH:mm}}" FontSize="16" Foreground="#333333" Margin="10 10 10 22" TextAlignment="Center" />
+
+            <Grid Margin="10" Background="#F5F5F5">
+                <Grid.RowDefinitions>
+                    <RowDefinition MinHeight="52"></RowDefinition>
+                    <RowDefinition MinHeight="52"></RowDefinition>
+                    <RowDefinition MinHeight="52"></RowDefinition>
+                    <RowDefinition MinHeight="52"></RowDefinition>
+                    <RowDefinition MinHeight="52"></RowDefinition>
+                    <RowDefinition MinHeight="52"></RowDefinition>
+                    <RowDefinition MinHeight="52"></RowDefinition>
+                    <RowDefinition MinHeight="52"></RowDefinition>
+                    <RowDefinition MinHeight="52"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="121"></ColumnDefinition>
+                    <ColumnDefinition Width="404"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Border Grid.Column="1" Grid.RowSpan="9" BorderBrush="#FFF" BorderThickness="2,0,0,0" Background="{x:Null}" />
+                <Border Grid.Row="0" Grid.ColumnSpan="2" BorderBrush="#FFF" BorderThickness="0,0,0,2" Background="{x:Null}" />
+                <Border Grid.Row="1" Grid.ColumnSpan="2" BorderBrush="#FFF" BorderThickness="0,0,0,2" Background="{x:Null}" />
+                <Border Grid.Row="2" Grid.ColumnSpan="2" BorderBrush="#FFF" BorderThickness="0,0,0,2" Background="{x:Null}" />
+                <Border Grid.Row="3" Grid.ColumnSpan="2" BorderBrush="#FFF" BorderThickness="0,0,0,2" Background="{x:Null}" />
+                <Border Grid.Row="4" Grid.ColumnSpan="2" BorderBrush="#FFF" BorderThickness="0,0,0,2" Background="{x:Null}" />
+                <Border Grid.Row="5" Grid.ColumnSpan="2" BorderBrush="#FFF" BorderThickness="0,0,0,2" Background="{x:Null}" />
+                <Border Grid.Row="6" Grid.ColumnSpan="2" BorderBrush="#FFF" BorderThickness="0,0,0,2" Background="{x:Null}" />
+                <Border Grid.Row="7" Grid.ColumnSpan="2" BorderBrush="#FFF" BorderThickness="0,0,0,2" Background="{x:Null}" />
+                <Border Grid.Row="8" Grid.ColumnSpan="2" BorderBrush="#FFF" BorderThickness="0,0,0,2" Background="{x:Null}" />
+
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="金额" Style="{StaticResource TxItemTitle}" />
+                <ContentControl Grid.Row="0" Grid.Column="2" Style="{StaticResource TxItemContent}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Transaction.Amount, Converter={StaticResource MoneyConverter}}" />
+                        <TextBlock Text="BTC" Visibility="{Binding Transaction.IsBTC, Converter={StaticResource BoolToVisibility}}" Margin="5 0 0 0" />
+                        <TextBlock Text="USDT" Visibility="{Binding Transaction.IsBTC, Converter={StaticResource InverseBoolToVisibility}}" Margin="5 0 0 0" />
+                    </StackPanel>
+                </ContentControl>
+
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="发送地址" Style="{StaticResource TxItemTitle}" />
+                <ContentControl Grid.Row="1" Grid.Column="2" Style="{StaticResource TxItemContent}">
+                    <StackPanel>
+                        <!--<TextBlock Text="{Binding Transaction.FromAccountName}" Foreground="#5B78F3" Cursor="Hand" Visibility="{Binding Transaction.FromAccountName, Converter={StaticResource InverseNullBoolToVisibility}}" />-->
+                        <TextBlock Text="{Binding Transaction.FromAddress}" />
+                    </StackPanel>
+                </ContentControl>
+
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="接收地址" Style="{StaticResource TxItemTitle}"  />
+                <ContentControl Grid.Row="2" Grid.Column="2" Style="{StaticResource TxItemContent}">
+                    <StackPanel>
+                        <!--<TextBlock Text="{Binding Transaction.ToAccountName}" Foreground="#5B78F3" Cursor="Hand"  Visibility="{Binding Transaction.ToAccountName, Converter={StaticResource InverseNullBoolToVisibility}}" />-->
+                        <TextBlock Text="{Binding Transaction.ToAddress}" />
+                    </StackPanel>
+                </ContentControl>
+
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="找零地址" Style="{StaticResource TxItemTitle}"  />
+                <ContentControl Grid.Row="3" Grid.Column="2" Style="{StaticResource TxItemContent}">
+                    <StackPanel>
+                        <!--<TextBlock Text="{Binding Transaction.ToAccountName}" Foreground="#5B78F3" Cursor="Hand"  Visibility="{Binding Transaction.ToAccountName, Converter={StaticResource InverseNullBoolToVisibility}}" />-->
+                        <TextBlock Text="{Binding Transaction.ChangeAddress}" />
+                    </StackPanel>
+                </ContentControl>
+
+                <TextBlock Grid.Row="4" Grid.Column="0" Text="手续费地址" Style="{StaticResource TxItemTitle}"  />
+                <ContentControl Grid.Row="4" Grid.Column="2" Style="{StaticResource TxItemContent}">
+                    <StackPanel>
+                        <!--<TextBlock Text="{Binding Transaction.ToAccountName}" Foreground="#5B78F3" Cursor="Hand"  Visibility="{Binding Transaction.ToAccountName, Converter={StaticResource InverseNullBoolToVisibility}}" />-->
+                        <TextBlock Text="{Binding Transaction.FeeAddress}" />
+                    </StackPanel>
+                </ContentControl>
+
+                <TextBlock Grid.Row="5" Grid.Column="0" Text="费率" Style="{StaticResource TxItemTitle}"  />
+                <ContentControl Grid.Row="5" Grid.Column="2" Style="{StaticResource TxItemContent}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Transaction.FeeRate, Converter={StaticResource FeeRateConverter}}"  />
+                        <TextBlock Margin="10 0 0 0" Text="BTC/KB"  />
+                    </StackPanel>
+                </ContentControl>
+
+                <TextBlock Grid.Row="6" Grid.Column="0" Text="预计大小" Style="{StaticResource TxItemTitle}"  />
+                <ContentControl Grid.Row="6" Grid.Column="2" Style="{StaticResource TxItemContent}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Transaction.EstimateSize}"  />
+                        <TextBlock Margin="10 0 0 0" Text="Bytes"  />
+                    </StackPanel>
+                </ContentControl>
+
+                <TextBlock Grid.Row="7" Grid.Column="0" Text="手续费" Style="{StaticResource TxItemTitle}"  />
+                <ContentControl Grid.Row="7" Grid.Column="2" Style="{StaticResource TxItemContent}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Transaction.Fee, Converter={StaticResource MoneyConverter}}"  />
+                        <TextBlock Margin="10 0 0 0" Text="BTC"  />
+                    </StackPanel>
+                </ContentControl>
+
+                <TextBlock Grid.Row="8" Grid.Column="0" Text="Block" Style="{StaticResource TxItemTitle}"  />
+                <ContentControl Grid.Row="8" Grid.Column="2" Style="{StaticResource TxItemContent}">
+                    <StackPanel>
+                        <!--<TextBlock Text="{Binding Transaction.BlockNumber, Converter={StaticResource NullOrEmptyConverter}}" />-->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 5 0 0" >
+                            <TextBlock Text="{Binding Transaction.BlockHash, Converter={StaticResource NullOrEmptyConverter}}" Width="300" TextTrimming="CharacterEllipsis" />
+                            <Image Source="/Images/copy.png" Margin="5 0 0 0" Width="14" Height="14"  Cursor="Hand" Visibility="{Binding Transaction.BlockHash, Converter={StaticResource InverseNullBoolToVisibility}}" >
+                                <Image.InputBindings>
+                                    <MouseBinding MouseAction="LeftClick" Command="{Binding CopyBlockHashCommand}" />
+                                </Image.InputBindings>
+                            </Image>
+                        </StackPanel>
+
+                    </StackPanel>
+                </ContentControl>
+
+            </Grid>
+
+            <StackPanel Margin="0 30 0 0" Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button Command="{Binding CloseCommand}" Style="{StaticResource TxConfirmBtnStyle }" Margin="0 0 10 0">
+                    <Button.Content>
+                        <TextBlock TextAlignment="Center" VerticalAlignment="Center" Text="关闭"></TextBlock>
+                    </Button.Content>
+                </Button>
+            </StackPanel>
+
+        </StackPanel>
+
+    </Grid>
+
+
+</UserControl>

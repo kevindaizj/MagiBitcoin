@@ -13,7 +13,9 @@ using USDTWallet.Common.Operators;
 using USDTWallet.Dao.Address;
 using USDTWallet.Dao.Transaction;
 using USDTWallet.Dao.Wallet;
+using USDTWallet.Models.Enums.Transaction;
 using USDTWallet.Models.Models.FeeRates;
+using USDTWallet.Models.Models.Transactions;
 
 namespace USDTWallet.Biz.Transactions
 {
@@ -69,7 +71,6 @@ namespace USDTWallet.Biz.Transactions
             return privateKeys;
         }
 
-
         public async Task<FeeRate> GetFeeRate()
         {
             using (var client = new HttpClient())
@@ -84,7 +85,6 @@ namespace USDTWallet.Biz.Transactions
             }
         }
 
-
         public async Task SignAndSendTransactionByPrivateKey(List<string> privKeys, string transactionHex, List<Coin> spentCoins)
         {
             var network = NetworkOperator.Instance.Network;
@@ -94,6 +94,62 @@ namespace USDTWallet.Biz.Transactions
 
             TransactionDao.Sign(tx.GetHash().ToString(), txId.ToString());
         }
+
+
+
+        public List<TransactionInfoVM> GetTransactions()
+        {
+            var transactions = TransactionDao.GetAllSignedTransaction();
+            var results = new List<TransactionInfoVM>();
+            foreach(var tx in transactions)
+            {
+                var feeRate = new FeeRate(tx.FeeRate);
+                var fee = feeRate.GetFee(tx.EstimateSize);
+
+                results.Add(new TransactionInfoVM
+                {
+                    TransactionId = tx.TransactionId,
+                    TransactionType = tx.TransactionType,
+                    FromAddress = tx.FromAddress,
+                    ToAddress = tx.ToAddress,
+                    ChangeAddress = tx.ChangeAddress,
+                    FeeAddress = tx.FeeAddress,
+                    FeeRate = new FeeRate(tx.FeeRate),
+                    EstimateSize = tx.EstimateSize,
+                    Fee = fee,
+                    Amount = new Money(tx.Amount, MoneyUnit.BTC),
+                    BlockHash = tx.BlockHash,
+                    Confirmations = tx.Confirmations ?? 0,
+                    CreateDate = tx.CreateDate,
+                    IsBTC = tx.TransactionType == (int)TransactionType.BTC,
+                    IsConfirmed = tx.Confirmations > 0
+                });
+            }
+
+            return results;
+        }
+
+
+        public async Task<CustomRawTransactionInfo> CheckAndRecordTransactionStatus(string transactionId)
+        {
+            uint256 txId = uint256.Parse(transactionId);
+            var raw = await BTCOperator.Instance.GetRawTransactionInfoAsync(txId);
+            if (raw.Confirmations <= 0)
+                return null;
+            
+            var updatedModel = new TransactionUpdateModel
+            {
+                TransactionId = transactionId,
+                BlockHash = raw.BlockHash.ToString(),
+                BlockTime = raw.BlockTime.HasValue ? raw.BlockTime.Value.UtcDateTime : (DateTime?)null,
+                Confirmations = raw.Confirmations
+            };
+
+            TransactionDao.UpdateTransaction(updatedModel);
+
+            return raw;
+        }
+
 
     }
 }

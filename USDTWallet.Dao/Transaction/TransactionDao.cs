@@ -87,8 +87,60 @@ namespace USDTWallet.Dao.Transaction
                 {
                     entity.TRANSACTION_ID = txId;
                     entity.IS_SIGNED = true;
+                    entity.CREATE_DATE = DateTime.Now;
                     db.SaveChanges();
                 }
+            }
+        }
+
+        public List<BaseTransactionInfo> GetAllSignedTransaction()
+        {
+            using (var db = this.GetWalletContext())
+            {
+                var query = from t in db.BASE_TRANSACTION
+                            where t.IS_SIGNED == true
+                            orderby t.CREATE_DATE descending
+                            select new BaseTransactionInfo
+                            {
+                                Id = t.ID,
+                                TransactionId = t.TRANSACTION_ID,
+                                TransactionType = t.TRANSACTION_TYPE,
+                                FromAddress = t.FROM_ADDRESS,
+                                ToAddress = t.TO_ADDRESS,
+                                ChangeAddress = t.CHANGE_ADDRESS,
+                                FeeAddress = t.FEE_ADDRESS,
+                                FeeRate = t.FEE_RATE,
+                                EstimateSize = t.ESTIMATE_SIZE,
+                                Amount = t.AMOUNT,
+                                IsSigned = t.IS_SIGNED,
+                                BlockHash = t.BLOCK_HASH,
+                                Confirmations = t.CONFIRMATIONS,
+                                BlockTime = t.BLOCK_TIME,
+                                CreateDate = t.CREATE_DATE
+                            };
+
+                return query.ToList();
+            }
+        }
+
+        public void UpdateTransaction(TransactionUpdateModel model)
+        {
+            using (var db = this.GetWalletContext())
+            {
+                var query = from t in db.BASE_TRANSACTION
+                            where t.TRANSACTION_ID == model.TransactionId
+                            select t;
+
+                var entity = query.SingleOrDefault();
+                if (null != entity)
+                {
+                    entity.BLOCK_HASH = model.BlockHash;
+                    entity.BLOCK_TIME = model.BlockTime;
+                    entity.CONFIRMATIONS = model.Confirmations;
+
+                    db.SaveChanges();
+                }
+
             }
         }
     }

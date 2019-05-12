@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace USDTWallet.Views.Popups.Transactions
 {
     /// <summary>
-    /// Interaction logic for GenTransaction.xaml
+    /// Interaction logic for TransactionDetailPopup.xaml
     /// </summary>
-    public partial class GenTransaction : UserControl
+    public partial class TransactionDetailPopup : UserControl
     {
-        public GenTransaction()
+        public TransactionDetailPopup()
         {
             InitializeComponent();
         }
