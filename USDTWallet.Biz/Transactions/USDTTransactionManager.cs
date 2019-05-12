@@ -69,6 +69,7 @@ namespace USDTWallet.Biz.Transactions
             while (totalBTC > coinAmount);
 
             var opReturnOutput = tx.Outputs.Single(o => o.ScriptPubKey.ToString().StartsWith("OP_RETURN"));
+            var originalOrderdOutput = tx.Clone().Outputs;
             
             builder.SetCoinSelector(new AllCoinSelector());
             builder.AddCoins(coins).SendFees(fee);

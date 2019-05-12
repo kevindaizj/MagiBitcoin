@@ -227,6 +227,10 @@
       <DependentUpon>LoginWallet.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Popups\Wallets\LoginWalletController.cs" />
+    <Compile Include="Views\Tools\ToolPage.xaml.cs">
+      <DependentUpon>ToolPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Tools\ToolPageController.cs" />
     <Compile Include="Views\TransactionOverview\TransactionOverviewPage.xaml.cs">
       <DependentUpon>TransactionOverviewPage.xaml</DependentUpon>
     </Compile>
@@ -304,6 +308,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Popups\Wallets\LoginWallet.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Tools\ToolPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

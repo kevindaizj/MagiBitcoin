@@ -65,8 +65,6 @@ namespace USDTWallet.Common.Operators
         }
 
 
-
-
         public async Task<Transaction> BuildUnsignedTx(string fromAddress, string toAddress, string changeAddress, Money amount, FeeRate estimateFeeRate, List<Coin> spentCoins)
         {
             var network = NetworkOperator.Instance.Network;
@@ -124,6 +122,17 @@ namespace USDTWallet.Common.Operators
                 Amount = new Money(amountDec, MoneyUnit.Satoshi)
             };
         }
+
+
+
+        public async Task<string> GetOmniTransaction(string transactionId)
+        {
+            var request = new RPCRequest("omni_gettransaction", new object[] { transactionId });
+            var response = await Client.SendCommandAsync(request);
+            var json = response.Result;
+            return json.ToString();
+        }
+
 
     }
 }

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using USDTWallet.Views.BTC;
 using USDTWallet.Views.Home;
 using USDTWallet.Views.Mempool;
+using USDTWallet.Views.Tools;
 using USDTWallet.Views.TransactionOverview;
 using USDTWallet.Views.USDT;
 
@@ -20,8 +21,9 @@ namespace USDTWallet.StartupConfigs
             containerRegistry.RegisterForNavigation<HomePage>();
             containerRegistry.RegisterForNavigation<BTCPage>();
             containerRegistry.RegisterForNavigation<USDTPage>();
-            containerRegistry.RegisterForNavigation<Mempool>();
             containerRegistry.RegisterForNavigation<TransactionOverviewPage>();
+            containerRegistry.RegisterForNavigation<Mempool>();
+            containerRegistry.RegisterForNavigation<ToolPage>();
         }
 
         public static void InitViewWithRegion(IRegionManager regionManager)
@@ -29,8 +31,9 @@ namespace USDTWallet.StartupConfigs
             regionManager.RegisterViewWithRegion(WalletRegions.GlobalRegion, typeof(HomePage));
             regionManager.RegisterViewWithRegion(WalletRegions.GlobalRegion, typeof(BTCPage));
             regionManager.RegisterViewWithRegion(WalletRegions.GlobalRegion, typeof(USDTPage));
-            regionManager.RegisterViewWithRegion(WalletRegions.GlobalRegion, typeof(Mempool));
             regionManager.RegisterViewWithRegion(WalletRegions.GlobalRegion, typeof(TransactionOverviewPage));
+            regionManager.RegisterViewWithRegion(WalletRegions.GlobalRegion, typeof(Mempool));
+            regionManager.RegisterViewWithRegion(WalletRegions.GlobalRegion, typeof(ToolPage));
         }
 
         public static class WalletRegions

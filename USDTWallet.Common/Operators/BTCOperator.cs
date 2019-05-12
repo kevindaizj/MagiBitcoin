@@ -55,7 +55,6 @@ namespace USDTWallet.Common.Operators
             return unspentList.Select(o => o.Amount).Sum();
         }
 
-
         public async Task<List<UnspentCoin>> ListUnspentAsync(string address, int minConf = 1)
         {
             var addr = BitcoinAddress.Create(address, NetworkOperator.Instance.Network);
@@ -304,6 +303,15 @@ namespace USDTWallet.Common.Operators
             tx.ReadWrite(Encoders.Hex.DecodeData(hex), NetworkOperator.Instance.Network);
             return tx;
         }
+
+
+        public async Task<Transaction> GetTransaction(string transactionId)
+        {
+            var txId = uint256.Parse(transactionId);
+            var raw = await this.GetRawTransactionInfoAsync(txId);
+            return raw.Transaction;
+        }
+
 
     }
 
