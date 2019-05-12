@@ -26,6 +26,26 @@
           <Property Name="DESCRIPTION" Type="nvarchar" MaxLength="500" />
           <Property Name="CREATE_DATE" Type="datetime" Nullable="false" />
         </EntityType>
+        <EntityType Name="BASE_TRANSACTION">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="TRANSACTION_ID" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="TRANSACTION_TYPE" Type="int" Nullable="false" />
+          <Property Name="FROM_ADDRESS" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="TO_ADDRESS" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="CHANGE_ADDRESS" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="FEE_ADDRESS" Type="varchar" MaxLength="100" />
+          <Property Name="FEE_RATE" Type="decimal" Precision="53" Scale="0" Nullable="false" />
+          <Property Name="ESTIMATE_SIZE" Type="int" Nullable="false" />
+          <Property Name="AMOUNT" Type="decimal" Precision="53" Scale="0" Nullable="false" />
+          <Property Name="IS_SIGNED" Type="bit" Nullable="false" />
+          <Property Name="BLOCK_HASH" Type="varchar" MaxLength="256" />
+          <Property Name="CONFIRMATIONS" Type="integer" />
+          <Property Name="BLOCK_TIME" Type="datetime" />
+          <Property Name="CREATE_DATE" Type="datetime" Nullable="false" />
+        </EntityType>
         <EntityType Name="BASE_WALLET">
           <Key>
             <PropertyRef Name="ID" />
@@ -40,6 +60,7 @@
         </EntityType>
         <EntityContainer Name="WalletModelStoreContainer">
           <EntitySet Name="BASE_ADDRESS" EntityType="Self.BASE_ADDRESS" store:Type="Tables" />
+          <EntitySet Name="BASE_TRANSACTION" EntityType="Self.BASE_TRANSACTION" store:Type="Tables" />
           <EntitySet Name="BASE_WALLET" EntityType="Self.BASE_WALLET" store:Type="Tables" />
         </EntityContainer>
       </Schema></edmx:StorageModels>
@@ -49,6 +70,7 @@
         <EntityContainer Name="WalletContext" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="BASE_ADDRESS" EntityType="WalletModel.BASE_ADDRESS" />
           <EntitySet Name="BASE_WALLET" EntityType="WalletModel.BASE_WALLET" />
+          <EntitySet Name="BASE_TRANSACTION" EntityType="WalletModel.BASE_TRANSACTION" />
         </EntityContainer>
         <EntityType Name="BASE_ADDRESS">
           <Key>
@@ -81,6 +103,26 @@
           <Property Name="MNEMONIC_WORDS" Type="String" MaxLength="2147483647" FixedLength="false" Unicode="true" />
           <Property Name="DESCRIPTION" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
           <Property Name="IS_ACTIVE" Type="Boolean" Nullable="false" />
+          <Property Name="CREATE_DATE" Type="DateTime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="BASE_TRANSACTION">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="TRANSACTION_ID" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="TRANSACTION_TYPE" Type="Int32" Nullable="false" />
+          <Property Name="FROM_ADDRESS" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="TO_ADDRESS" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="CHANGE_ADDRESS" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="FEE_ADDRESS" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="FEE_RATE" Type="Decimal" Nullable="false" Precision="53" Scale="0" />
+          <Property Name="ESTIMATE_SIZE" Type="Int32" Nullable="false" />
+          <Property Name="AMOUNT" Type="Decimal" Nullable="false" Precision="53" Scale="0" />
+          <Property Name="IS_SIGNED" Type="Boolean" Nullable="false" />
+          <Property Name="BLOCK_HASH" Type="String" MaxLength="256" FixedLength="false" Unicode="false" />
+          <Property Name="CONFIRMATIONS" Type="Int64" />
+          <Property Name="BLOCK_TIME" Type="DateTime" />
           <Property Name="CREATE_DATE" Type="DateTime" Nullable="false" />
         </EntityType>
       </Schema>
@@ -120,6 +162,27 @@
                 <ScalarProperty Name="MNEMONIC_WORDS" ColumnName="MNEMONIC_WORDS" />
                 <ScalarProperty Name="PASSWORD" ColumnName="PASSWORD" />
                 <ScalarProperty Name="WALLET_NAME" ColumnName="WALLET_NAME" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="BASE_TRANSACTION">
+            <EntityTypeMapping TypeName="WalletModel.BASE_TRANSACTION">
+              <MappingFragment StoreEntitySet="BASE_TRANSACTION">
+                <ScalarProperty Name="CREATE_DATE" ColumnName="CREATE_DATE" />
+                <ScalarProperty Name="BLOCK_TIME" ColumnName="BLOCK_TIME" />
+                <ScalarProperty Name="CONFIRMATIONS" ColumnName="CONFIRMATIONS" />
+                <ScalarProperty Name="BLOCK_HASH" ColumnName="BLOCK_HASH" />
+                <ScalarProperty Name="IS_SIGNED" ColumnName="IS_SIGNED" />
+                <ScalarProperty Name="AMOUNT" ColumnName="AMOUNT" />
+                <ScalarProperty Name="ESTIMATE_SIZE" ColumnName="ESTIMATE_SIZE" />
+                <ScalarProperty Name="FEE_RATE" ColumnName="FEE_RATE" />
+                <ScalarProperty Name="FEE_ADDRESS" ColumnName="FEE_ADDRESS" />
+                <ScalarProperty Name="CHANGE_ADDRESS" ColumnName="CHANGE_ADDRESS" />
+                <ScalarProperty Name="TO_ADDRESS" ColumnName="TO_ADDRESS" />
+                <ScalarProperty Name="FROM_ADDRESS" ColumnName="FROM_ADDRESS" />
+                <ScalarProperty Name="TRANSACTION_TYPE" ColumnName="TRANSACTION_TYPE" />
+                <ScalarProperty Name="TRANSACTION_ID" ColumnName="TRANSACTION_ID" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
               </MappingFragment>
             </EntityTypeMapping>

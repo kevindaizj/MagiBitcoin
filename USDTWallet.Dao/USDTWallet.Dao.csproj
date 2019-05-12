@@ -54,6 +54,7 @@
     <Compile Include="Address\AddressDao.cs" />
     <Compile Include="Common\DaoBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Transaction\TransactionDao.cs" />
     <Compile Include="Wallet\WalletDao.cs" />
   </ItemGroup>
   <ItemGroup>

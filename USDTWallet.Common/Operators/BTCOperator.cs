@@ -154,7 +154,7 @@ namespace USDTWallet.Common.Operators
             return Transaction.Parse(txHex, NetworkOperator.Instance.Network);
         }
         
-        public async Task SignAndSendTransactionByPrivateKey(List<string> privKeys, string transactionHex, List<Coin> spentCoins)
+        public async Task<uint256> SignAndSendTransactionByPrivateKey(List<string> privKeys, string transactionHex, List<Coin> spentCoins)
         {
             var network = NetworkOperator.Instance.Network;
             var tx = Transaction.Parse(transactionHex, network);
@@ -172,7 +172,8 @@ namespace USDTWallet.Common.Operators
             var a = tx.ToString();
             var status = tx.Check();
 
-            await Client.SendRawTransactionAsync(tx);
+            var txId = await Client.SendRawTransactionAsync(tx);
+            return txId;
         }
 
         public string SerailizeUnsignedTxResult(UnsignTransactionResult txInfo)

@@ -108,7 +108,7 @@ namespace USDTWallet.Views.Popups.Transactions
             else
             {
                 var keys = new List<string> { PrivKey, FeePrivKey };
-                await BTCOperator.Instance.SignAndSendTransactionByPrivateKey(keys, this.Transaction.ToHex(), this.SpentCoins);
+                await TxManager.SignAndSendTransactionByPrivateKey(keys, this.Transaction.ToHex(), this.SpentCoins);
             }
 
 

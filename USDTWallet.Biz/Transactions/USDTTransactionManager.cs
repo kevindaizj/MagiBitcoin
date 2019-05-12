@@ -8,6 +8,8 @@ using USDTWallet.Biz.Common;
 using USDTWallet.Common.CoinSelectors;
 using USDTWallet.Common.Exceptions;
 using USDTWallet.Common.Operators;
+using USDTWallet.Dao.Transaction;
+using USDTWallet.Models.Enums.Transaction;
 using USDTWallet.Models.Models.Transactions;
 using USDTWallet.Models.Models.Transfer;
 
@@ -15,6 +17,12 @@ namespace USDTWallet.Biz.Transactions
 {
     public class USDTTransactionManager : BizBase
     {
+        private TransactionDao TransactionDao { get; set; }
+        public USDTTransactionManager(TransactionDao txDao)
+        {
+            this.TransactionDao = txDao;
+        }
+
         public async Task<UnsignTransactionResult> BuildUnsignedTransaction(USDTTransferVM transferInfo)
         {
             var unspentCoins = await BTCOperator.Instance.ListUnspentAsync(transferInfo.FromAddress);
@@ -37,6 +45,7 @@ namespace USDTWallet.Biz.Transactions
             TransactionBuilder builder = null;
             Transaction tx = null;
             List<Coin> coins = null;
+            int size = 0;
             Money fee = null;
 
             do
@@ -49,7 +58,7 @@ namespace USDTWallet.Biz.Transactions
                 tx = await this.BuildUnsignedTx(builder, transferInfo.FromAddress, transferInfo.ToAddress, transferInfo.FeeAddress,
                                                 sentBTC, transferInfo.Amount, transferInfo.EstimateFeeRate, fromSpentCoin, feeSpentCoins);
 
-                var size = builder.EstimateSize(tx);
+                size = builder.EstimateSize(tx);
                 var feeAmount = size * transferInfo.EstimateFeeRate.SatoshiPerByte;
                 fee = new Money(feeAmount, MoneyUnit.Satoshi);
 
@@ -73,6 +82,25 @@ namespace USDTWallet.Biz.Transactions
                 Transaction = tx,
                 ToSpentCoins = coins
             };
+
+
+            var txInfo = new BaseTransactionInfo
+            {
+                Id = Guid.NewGuid().ToString("N"),
+                TransactionId = tx.GetHash().ToString(),
+                TransactionType = (short)TransactionType.USDT,
+                FromAddress = transferInfo.FromAddress,
+                ToAddress = transferInfo.ToAddress,
+                ChangeAddress = transferInfo.FeeAddress,
+                FeeAddress = transferInfo.FeeAddress,
+                FeeRate = transferInfo.EstimateFeeRate.SatoshiPerByte,
+                EstimateSize = size,
+                Amount = transferInfo.Amount.ToDecimal(MoneyUnit.BTC),
+                IsSigned = false,
+                CreateDate = DateTime.Now
+            };
+
+            TransactionDao.Create(txInfo);
 
             return result;
 

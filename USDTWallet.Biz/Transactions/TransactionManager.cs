@@ -11,6 +11,7 @@ using USDTWallet.Common.Exceptions;
 using USDTWallet.Common.Helpers;
 using USDTWallet.Common.Operators;
 using USDTWallet.Dao.Address;
+using USDTWallet.Dao.Transaction;
 using USDTWallet.Dao.Wallet;
 using USDTWallet.Models.Models.FeeRates;
 
@@ -20,23 +21,25 @@ namespace USDTWallet.Biz.Transactions
     {
         private WalletDao WalletDao { get; set; }
         private AddressDao AddressDao { get; set; }
+        private TransactionDao TransactionDao { get; set; }
 
-        public TransactionManager(WalletDao walletDao, AddressDao addressDao)
+        public TransactionManager(WalletDao walletDao, AddressDao addressDao, TransactionDao TxDao)
         {
             this.WalletDao = walletDao;
             this.AddressDao = addressDao;
+            this.TransactionDao = TxDao;
         }
 
-        public async Task SignAndSendTransaction(string password, string transactionHex, List<Coin> spentCoins)
+        public async Task SignAndSendBTCTransaction(string password, string transactionHex, List<Coin> spentCoins)
         {
             var privKeyWifs = this.GetPrivateKeys(password, spentCoins).Take(1).ToList();
-            await BTCOperator.Instance.SignAndSendTransactionByPrivateKey(privKeyWifs, transactionHex, spentCoins);
+            await this.SignAndSendTransactionByPrivateKey(privKeyWifs, transactionHex, spentCoins);
         }
 
         public async Task SignAndSendUSDTTransaction(string password, string transactionHex, List<Coin> spentCoins)
         {
             var privKeyWifs = this.GetPrivateKeys(password, spentCoins);
-            await BTCOperator.Instance.SignAndSendTransactionByPrivateKey(privKeyWifs, transactionHex, spentCoins);
+            await this.SignAndSendTransactionByPrivateKey(privKeyWifs, transactionHex, spentCoins);
         }
 
 
@@ -79,6 +82,17 @@ namespace USDTWallet.Biz.Transactions
                 
                 return new FeeRate((decimal)result.fastestFee);
             }
+        }
+
+
+        public async Task SignAndSendTransactionByPrivateKey(List<string> privKeys, string transactionHex, List<Coin> spentCoins)
+        {
+            var network = NetworkOperator.Instance.Network;
+            var tx = Transaction.Parse(transactionHex, network);
+
+            var txId = await BTCOperator.Instance.SignAndSendTransactionByPrivateKey(privKeys, transactionHex, spentCoins);
+
+            TransactionDao.Sign(tx.GetHash().ToString(), txId.ToString());
         }
 
     }

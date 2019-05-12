@@ -67,6 +67,9 @@
     <Compile Include="Context\BASE_ADDRESS.cs">
       <DependentUpon>WalletContext.tt</DependentUpon>
     </Compile>
+    <Compile Include="Context\BASE_TRANSACTION.cs">
+      <DependentUpon>WalletContext.tt</DependentUpon>
+    </Compile>
     <Compile Include="Context\BASE_WALLET.cs">
       <DependentUpon>WalletContext.tt</DependentUpon>
     </Compile>

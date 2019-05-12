@@ -98,12 +98,12 @@ namespace USDTWallet.Views.Popups.Transactions
             if(PwdMethod)
             {
                 var pwd = SecureStringHelper.SecureStringToString(Password);
-                await TxManager.SignAndSendTransaction(pwd, this.Transaction.ToHex(), this.SpentCoins);
+                await TxManager.SignAndSendBTCTransaction(pwd, this.Transaction.ToHex(), this.SpentCoins);
             }
             else
             {
                 var keys = new List<string> { PrivKey };
-                await BTCOperator.Instance.SignAndSendTransactionByPrivateKey(keys, this.Transaction.ToHex(), this.SpentCoins);
+                await TxManager.SignAndSendTransactionByPrivateKey(keys, this.Transaction.ToHex(), this.SpentCoins);
             }
 
             
