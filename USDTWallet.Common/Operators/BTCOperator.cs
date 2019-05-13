@@ -313,7 +313,7 @@ namespace USDTWallet.Common.Operators
             var raw = await this.GetRawTransactionInfoAsync(txId);
             return raw.Transaction;
         }
-
+        
 
     }
 

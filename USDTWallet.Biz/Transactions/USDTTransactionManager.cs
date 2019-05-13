@@ -25,19 +25,23 @@ namespace USDTWallet.Biz.Transactions
 
         public async Task<UnsignTransactionResult> BuildUnsignedTransaction(USDTTransferVM transferInfo)
         {
-            var unspentCoins = await BTCOperator.Instance.ListUnspentAsync(transferInfo.FromAddress);
-            var sentBTC = new Money(USDTOperator.SentBTCPerTx, MoneyUnit.BTC);
-            var fromSpentCoin = unspentCoins.Where(o => o.Amount >= sentBTC).OrderByDescending(o => o.Amount)
-                                             .Select(o => o.AsCoin()).FirstOrDefault();
+            var fromAddressUnspentCoins = await BTCOperator.Instance.ListUnspentAsync(transferInfo.FromAddress);
+
+            var dustCostBTC = USDTOperator.Instance.GetP2PKHDustThreadhold();
+            var fromSpentCoin = fromAddressUnspentCoins.Where(o => o.Amount >= dustCostBTC)
+                                                       .OrderByDescending(o => o.Amount)
+                                                       .Select(o => o.AsCoin())
+                                                       .FirstOrDefault();
             if (null == fromSpentCoin)
-                throw new WTException(ExceptionCode.insufficientBTC, "发送地址没有足够的BTC：至少需要：" + USDTOperator.SentBTCPerTx);
+                throw new WTException(ExceptionCode.insufficientBTC, "发送地址没有足够的BTC：至少需要：" + dustCostBTC.ToString());
             
             var network = NetworkOperator.Instance.Network;
-            var to = BitcoinAddress.Create(transferInfo.ToAddress, network);
-            var change = BitcoinAddress.Create(transferInfo.FeeAddress, network);
+            var toAddress = BitcoinAddress.Create(transferInfo.ToAddress, network);
+            var feeAddress = BitcoinAddress.Create(transferInfo.FeeAddress, network);
 
             var feeUnspentCoins = await BTCOperator.Instance.ListUnspentAsync(transferInfo.FeeAddress);
             var allFeeCoinAmount = feeUnspentCoins.Select(o => o.Amount).Sum();
+            //allFeeCoinAmount += fromSpentCoin.Amount;
 
 
             var totalBTC = Money.Parse("0");
@@ -57,13 +61,13 @@ namespace USDTWallet.Biz.Transactions
                 coins = feeSpentCoins.Concat(new List<Coin> { fromSpentCoin }).ToList();
 
                 tx = await this.BuildUnsignedTx(builder, transferInfo.FromAddress, transferInfo.ToAddress, transferInfo.FeeAddress,
-                                                sentBTC, transferInfo.Amount, transferInfo.EstimateFeeRate, fromSpentCoin, feeSpentCoins);
+                                                dustCostBTC, transferInfo.Amount, transferInfo.EstimateFeeRate, fromSpentCoin, feeSpentCoins);
 
                 size = builder.EstimateSize(tx);
                 var feeAmount = size * transferInfo.EstimateFeeRate.SatoshiPerByte;
                 fee = new Money(feeAmount, MoneyUnit.Satoshi);
 
-                totalBTC = sentBTC + fee;
+                totalBTC = dustCostBTC + fee;
                 coinAmount = coins.Select(o => o.Amount).Sum();
 
                 if (null != fee && fee > allFeeCoinAmount)
@@ -79,7 +83,7 @@ namespace USDTWallet.Biz.Transactions
             builder.AddCoins(coins).SendFees(fee);
             tx = builder.BuildTransaction(false);
 
-            this.ReorganizeOutput(tx, to, opReturnOutput);
+            this.ReorganizeOutput(tx, toAddress, opReturnOutput);
             
             var sssize = builder.EstimateSize(tx);
 
@@ -129,7 +133,7 @@ namespace USDTWallet.Biz.Transactions
         }
 
         private async Task<Transaction> BuildUnsignedTx(TransactionBuilder builder, string fromAddress, string toAddress, string feeAddress, 
-                                                       Money btcAmount, Money usdtAmount, FeeRate feeRate, Coin fromCoin, List<Coin> feeCoins)
+                                                       Money dustBTCAmount, Money usdtAmount, FeeRate feeRate, Coin fromCoin, List<Coin> feeCoins)
         {
             var network = NetworkOperator.Instance.Network;
             var to = BitcoinAddress.Create(toAddress, network);
@@ -137,9 +141,9 @@ namespace USDTWallet.Biz.Transactions
 
             var tx = builder.AddCoins(fromCoin)
                             .AddCoins(feeCoins)
-                            .Send(to, btcAmount)
+                            .Send(to, dustBTCAmount)
                             .SetChange(feeAddr)
-                            .SetCoinSelector(new USDTCoinSelector(fromCoin.Outpoint))
+                            .SetCoinSelector(new USDTCoinSelector(fromCoin.Outpoint, dustBTCAmount))
                             .BuildTransaction(false);
 
             var detail = tx.ToString();
@@ -149,7 +153,7 @@ namespace USDTWallet.Biz.Transactions
             var receiveRef = await USDTOperator.Instance.GenerateReference(opreturn, toAddress);
 
             var finalTx = Transaction.Parse(receiveRef, network);
-            this.KeepDustOutputUnique(finalTx);
+            this.KeepDustOutputUnique(finalTx, dustBTCAmount);
 
             var finalDetail = finalTx.ToString();
 
@@ -157,10 +161,8 @@ namespace USDTWallet.Biz.Transactions
         }
 
 
-        private void KeepDustOutputUnique(Transaction tx)
+        private void KeepDustOutputUnique(Transaction tx, Money dust)
         {
-            var dust = new Money(USDTOperator.SentBTCPerTx, MoneyUnit.BTC);
-
             var dupIndexs = new List<uint>();
             for(uint i = 0; i < tx.Outputs.Count; i++)
             {
@@ -183,6 +185,142 @@ namespace USDTWallet.Biz.Transactions
                 tx.Outputs.Add(output);
             }
         }
+
+
+        public async Task<UnsignTransactionResult> BuildUnsignedTransaction2(USDTTransferVM transferInfo)
+        {
+            var network = NetworkOperator.Instance.Network;
+            var toAddress = BitcoinAddress.Create(transferInfo.ToAddress, network);
+            var feeAddress = BitcoinAddress.Create(transferInfo.FeeAddress, network);
+
+            var omniOutputs = await this.GetOmniFeaturedOutputs(toAddress, transferInfo.Amount);
+
+            
+            var dustCostBTC = omniOutputs.ReferenceOutput.Value;
+
+            var fromAddressUnspentCoins = await BTCOperator.Instance.ListUnspentAsync(transferInfo.FromAddress);
+            var fromSpentCoin = fromAddressUnspentCoins.Where(o => o.Amount >= dustCostBTC)
+                                                       .OrderByDescending(o => o.Amount)
+                                                       .Select(o => o.AsCoin())
+                                                       .FirstOrDefault();
+            if (null == fromSpentCoin)
+                throw new WTException(ExceptionCode.insufficientBTC, "发送地址没有足够的BTC：至少需要：" + dustCostBTC.ToString());
+            
+            var feeUnspentCoins = await BTCOperator.Instance.ListUnspentAsync(transferInfo.FeeAddress);
+            var allFeeCoinAmount = feeUnspentCoins.Select(o => o.Amount).Sum();
+            //allFeeCoinAmount += fromSpentCoin.Amount;
+
+
+            var totalBTC = Money.Parse("0");
+            var coinAmount = Money.Parse("0");
+
+            TransactionBuilder builder = null;
+            Transaction tx = null;
+            List<Coin> coins = null;
+            int size = 0;
+            Money fee = null;
+
+            do
+            {
+                builder = network.CreateTransactionBuilder();
+
+                var feeSpentCoins = BTCOperator.Instance.SelectCoinsToSpent(feeUnspentCoins, totalBTC);
+                coins = feeSpentCoins.Concat(new List<Coin> { fromSpentCoin }).ToList();
+
+                tx = await this.BuildUnsignedTx(builder, transferInfo.FromAddress, transferInfo.ToAddress, transferInfo.FeeAddress,
+                                                dustCostBTC, transferInfo.Amount, transferInfo.EstimateFeeRate, fromSpentCoin, feeSpentCoins);
+
+                size = builder.EstimateSize(tx);
+                var feeAmount = size * transferInfo.EstimateFeeRate.SatoshiPerByte;
+                fee = new Money(feeAmount, MoneyUnit.Satoshi);
+
+                totalBTC = dustCostBTC + fee;
+                coinAmount = coins.Select(o => o.Amount).Sum();
+
+                if (null != fee && fee > allFeeCoinAmount)
+                    throw new WTException(ExceptionCode.insufficientBTC, "手续费地址没有足够的BTC支付手续费: " + fee.ToString() + " BTC");
+
+            }
+            while (totalBTC > coinAmount);
+
+            var opReturnOutput = tx.Outputs.Single(o => o.ScriptPubKey.ToString().StartsWith("OP_RETURN"));
+
+
+            builder.SetCoinSelector(new AllCoinSelector());
+            builder.AddCoins(coins).SendFees(fee);
+            tx = builder.BuildTransaction(false);
+
+            this.ReorganizeOutput(tx, toAddress, opReturnOutput);
+
+            var sssize = builder.EstimateSize(tx);
+
+
+            var txInfo = new BaseTransactionInfo
+            {
+                Id = Guid.NewGuid().ToString("N"),
+                TransactionId = tx.GetHash().ToString(),
+                TransactionType = (short)TransactionType.USDT,
+                FromAddress = transferInfo.FromAddress,
+                ToAddress = transferInfo.ToAddress,
+                ChangeAddress = transferInfo.FeeAddress,
+                FeeAddress = transferInfo.FeeAddress,
+                FeeRate = transferInfo.EstimateFeeRate.SatoshiPerByte,
+                EstimateSize = size,
+                Amount = transferInfo.Amount.ToDecimal(MoneyUnit.BTC),
+                IsSigned = false,
+                CreateDate = DateTime.Now
+            };
+
+            TransactionDao.Create(txInfo);
+
+
+            var result = new UnsignTransactionResult
+            {
+                OperationId = txInfo.Id,
+                Transaction = tx,
+                ToSpentCoins = coins
+            };
+
+            return result;
+
+        }
+
+
+        private async Task<OmniFeaturedOutputs> GetOmniFeaturedOutputs(BitcoinAddress toAddress, Money amount)
+        {
+            var fakedNetwork = Network.RegTest;
+            var builder = fakedNetwork.CreateTransactionBuilder();
+            
+            var fakedCost = Money.Parse("100");
+            var fakedAddress = BitcoinAddress.Create("n3MmAVgkrTA4ep4rVmppDL2PMH4VafNG5R", fakedNetwork);
+            var txOut = new TxOut(fakedCost, fakedAddress);
+            var outpoint = new OutPoint(uint256.One, 0);
+            var fakedCoin = new Coin(outpoint, txOut);
+
+            var tx = builder.AddCoins(fakedCoin)
+                            .Send(toAddress, fakedCost)
+                            .BuildTransaction(false);
+            tx.Outputs.Clear();
+
+            var amountPayload = await USDTOperator.Instance.CreatePayloadSimpleSend(amount);
+            var opreturn = await USDTOperator.Instance.GenerateOpRetrun(tx.ToHex(), amountPayload);
+            var receiveRef = await USDTOperator.Instance.GenerateReference(opreturn, toAddress.ToString());
+
+            tx = Transaction.Parse(receiveRef, fakedNetwork);
+
+            var result = new OmniFeaturedOutputs();
+            foreach(var o in tx.Outputs)
+            {
+                var script = o.ScriptPubKey.ToString();
+                if (script.StartsWith("OP_RETURN"))
+                    result.OpReturnOutput = o;
+                else
+                    result.ReferenceOutput = o;
+            }
+
+            return result;
+        }
+
 
 
     }

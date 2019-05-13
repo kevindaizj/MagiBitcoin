@@ -1,6 +1,7 @@
 ﻿using NBitcoin;
 using NBitcoin.DataEncoders;
 using NBitcoin.RPC;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -24,8 +25,6 @@ namespace USDTWallet.Common.Operators
         private RPCClient Client { get; set; }
 
         public static readonly UInt64 PropertyId = 2147483651;
-
-        public static readonly decimal SentBTCPerTx = 0.00000546M;
 
         private USDTOperator()
         {
@@ -63,6 +62,33 @@ namespace USDTWallet.Common.Operators
             var resp = await Client.SendCommandAsync("omni_createrawtx_reference", opreturn, toAddress);
             return resp.Result.ToString();
         }
+
+        public async Task<string> CreateRawTxChange(string rawtx, List<Coin> coins, BitcoinAddress destination, Money fee, int position = 0)
+        {
+            var prevtxs = new JArray();
+            foreach (var prev in coins)
+            {
+                var amount = prev.Amount.ToDecimal(MoneyUnit.BTC);
+
+                JObject prevObj = new JObject();
+                prevObj.Add(new JProperty("txid", prev.Outpoint.Hash.ToString()));
+                prevObj.Add(new JProperty("vout", prev.Outpoint.N));
+                prevObj.Add(new JProperty("scriptPubKey", prev.ScriptPubKey.ToHex()));
+                prevObj.Add(new JProperty("value", amount));
+                prevtxs.Add(prevObj);
+            }
+
+
+            var resp = await Client.SendCommandAsync("omni_createrawtx_change",
+                                          rawtx,
+                                          prevtxs,
+                                          destination.ToString(),
+                                          fee.ToString(),
+                                          position);
+
+            return resp.Result.ToString();
+        }
+
 
 
         public async Task<Transaction> BuildUnsignedTx(string fromAddress, string toAddress, string changeAddress, Money amount, FeeRate estimateFeeRate, List<Coin> spentCoins)
@@ -133,6 +159,20 @@ namespace USDTWallet.Common.Operators
             return json.ToString();
         }
 
+        public FeeRate GetMinRelayTxFee()
+        {
+            var resp = Client.SendCommand(RPCOperations.getnetworkinfo);
+            var jResult = ((JObject)resp.Result);
+            var relayTxFee = jResult["relayfee"].Value<decimal>();
+            return new FeeRate(new Money(relayTxFee, MoneyUnit.BTC));
+        }
+
+        public Money GetP2PKHDustThreadhold()
+        {
+            var output = new TxOut(Money.Parse("0"), BitcoinAddress.Create("mjparMCvVPaUYmQWuWtCdygRKN3vaSRvjP", Network.TestNet));
+            var minRelayTxFee = this.GetMinRelayTxFee();
+            return output.GetDustThreshold(minRelayTxFee);
+        }
 
     }
 }

@@ -10,26 +10,30 @@ namespace USDTWallet.Common.CoinSelectors
 {
     public class USDTCoinSelector : ICoinSelector
     {
-        private OutPoint DustOut { get; set; }
+        private OutPoint FromOutpoint { get; set; }
 
-        public USDTCoinSelector(OutPoint dustOut)
+        private Money DustAmount { get; set; }
+
+        public USDTCoinSelector(OutPoint fromOutpoint, Money dustAmount)
         {
-            this.DustOut = dustOut;
+            this.FromOutpoint = fromOutpoint;
+            this.DustAmount = dustAmount;
         }
 
         public IEnumerable<ICoin> Select(IEnumerable<ICoin> coins, IMoney target)
         {
-            var dustAmount = USDTOperator.SentBTCPerTx;
             var defaultSelector = new DefaultCoinSelector();
 
-            var dust = coins.FirstOrDefault(o => o.Outpoint == this.DustOut);
-            if (null == dust)
-                return defaultSelector.Select(coins, target);
+            var fromCoin = coins.FirstOrDefault(o => o.Outpoint == this.FromOutpoint);
 
-            if (dust.Amount.CompareTo(target) >= 0)
+            if (null != fromCoin &&
+                fromCoin.Amount.CompareTo(target) >= 0 &&
+                DustAmount.CompareTo(target) == 0)
+            {
                 return coins;
+            }
             
-            return defaultSelector.Select(coins, target);
+            return new DefaultCoinSelector().Select(coins, target);
         }
     }
 }
