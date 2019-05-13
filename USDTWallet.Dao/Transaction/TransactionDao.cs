@@ -74,12 +74,12 @@ namespace USDTWallet.Dao.Transaction
             }
         }
 
-        public void Sign(string unsignedTxId, string txId)
+        public void Sign(string id, string txId)
         {
             using (var db = this.GetWalletContext())
             {
                 var query = from t in db.BASE_TRANSACTION
-                            where t.TRANSACTION_ID == unsignedTxId
+                            where t.ID == id
                             select t;
 
                 var entity = query.SingleOrDefault();
@@ -90,6 +90,18 @@ namespace USDTWallet.Dao.Transaction
                     entity.CREATE_DATE = DateTime.Now;
                     db.SaveChanges();
                 }
+            }
+        }
+
+        public bool AnyTransactionsByTxId(string transactionId)
+        {
+            using (var db = this.GetWalletContext())
+            {
+                var query = from t in db.BASE_TRANSACTION
+                            where t.TRANSACTION_ID == transactionId
+                            select t;
+
+                return query.Any();
             }
         }
 

@@ -9,6 +9,7 @@ namespace USDTWallet.Models.Models.Transactions
 {
     public class UnsignTransactionResult
     {
+        public string OperationId { get; set; }
         public Transaction Transaction { get; set; }
         public List<Coin> ToSpentCoins { get; set; }
     }

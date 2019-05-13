@@ -81,12 +81,19 @@ namespace USDTWallet.Views.TransactionOverview
             {
                 DispatcherHelper.Invoke(async () =>
                 {
-                    var raw = await TransactionManager.CheckAndRecordTransactionStatus(tx.TransactionId);
-                    if (null != raw)
+                    try
                     {
-                        tx.BlockHash = raw.BlockHash.ToString();
-                        tx.Confirmations = raw.Confirmations;
-                        tx.IsConfirmed = raw.Confirmations > 0;
+                        var raw = await TransactionManager.CheckAndRecordTransactionStatus(tx.TransactionId);
+                        if (null != raw)
+                        {
+                            tx.BlockHash = raw.BlockHash.ToString();
+                            tx.Confirmations = raw.Confirmations;
+                            tx.IsConfirmed = raw.Confirmations > 0;
+                        }
+                    }
+                    catch(Exception)
+                    {
+
                     }
                 });
             }

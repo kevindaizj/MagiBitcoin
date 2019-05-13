@@ -32,16 +32,16 @@ namespace USDTWallet.Biz.Transactions
             this.TransactionDao = TxDao;
         }
 
-        public async Task SignAndSendBTCTransaction(string password, string transactionHex, List<Coin> spentCoins)
+        public async Task SignAndSendBTCTransaction(string password, string transactionHex, List<Coin> spentCoins, string operationId)
         {
             var privKeyWifs = this.GetPrivateKeys(password, spentCoins).Take(1).ToList();
-            await this.SignAndSendTransactionByPrivateKey(privKeyWifs, transactionHex, spentCoins);
+            await this.SignAndSendTransactionByPrivateKey(privKeyWifs, transactionHex, spentCoins, operationId);
         }
 
-        public async Task SignAndSendUSDTTransaction(string password, string transactionHex, List<Coin> spentCoins)
+        public async Task SignAndSendUSDTTransaction(string password, string transactionHex, List<Coin> spentCoins, string operationId)
         {
             var privKeyWifs = this.GetPrivateKeys(password, spentCoins);
-            await this.SignAndSendTransactionByPrivateKey(privKeyWifs, transactionHex, spentCoins);
+            await this.SignAndSendTransactionByPrivateKey(privKeyWifs, transactionHex, spentCoins, operationId);
         }
 
 
@@ -85,14 +85,14 @@ namespace USDTWallet.Biz.Transactions
             }
         }
 
-        public async Task SignAndSendTransactionByPrivateKey(List<string> privKeys, string transactionHex, List<Coin> spentCoins)
+        public async Task SignAndSendTransactionByPrivateKey(List<string> privKeys, string transactionHex, List<Coin> spentCoins, string operationId)
         {
             var network = NetworkOperator.Instance.Network;
             var tx = Transaction.Parse(transactionHex, network);
 
             var txId = await BTCOperator.Instance.SignAndSendTransactionByPrivateKey(privKeys, transactionHex, spentCoins);
 
-            TransactionDao.Sign(tx.GetHash().ToString(), txId.ToString());
+            TransactionDao.Sign(operationId, txId.ToString());
         }
 
 

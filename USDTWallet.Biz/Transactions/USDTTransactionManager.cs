@@ -37,6 +37,7 @@ namespace USDTWallet.Biz.Transactions
             var change = BitcoinAddress.Create(transferInfo.FeeAddress, network);
 
             var feeUnspentCoins = await BTCOperator.Instance.ListUnspentAsync(transferInfo.FeeAddress);
+            var allFeeCoinAmount = feeUnspentCoins.Select(o => o.Amount).Sum();
 
 
             var totalBTC = Money.Parse("0");
@@ -65,24 +66,22 @@ namespace USDTWallet.Biz.Transactions
                 totalBTC = sentBTC + fee;
                 coinAmount = coins.Select(o => o.Amount).Sum();
 
+                if (null != fee && fee > allFeeCoinAmount)
+                    throw new WTException(ExceptionCode.insufficientBTC, "手续费地址没有足够的BTC支付手续费: " + fee.ToString() + " BTC");
+
             }
             while (totalBTC > coinAmount);
 
             var opReturnOutput = tx.Outputs.Single(o => o.ScriptPubKey.ToString().StartsWith("OP_RETURN"));
-            var originalOrderdOutput = tx.Clone().Outputs;
             
+
             builder.SetCoinSelector(new AllCoinSelector());
             builder.AddCoins(coins).SendFees(fee);
             tx = builder.BuildTransaction(false);
 
-            tx.Outputs.Insert(1, opReturnOutput);
+            this.ReorganizeOutput(tx, to, opReturnOutput);
+            
             var sssize = builder.EstimateSize(tx);
-
-            var result = new UnsignTransactionResult
-            {
-                Transaction = tx,
-                ToSpentCoins = coins
-            };
 
 
             var txInfo = new BaseTransactionInfo
@@ -103,10 +102,31 @@ namespace USDTWallet.Biz.Transactions
 
             TransactionDao.Create(txInfo);
 
+
+            var result = new UnsignTransactionResult
+            {
+                OperationId = txInfo.Id,
+                Transaction = tx,
+                ToSpentCoins = coins
+            };
+
             return result;
 
         }
 
+        private void ReorganizeOutput(Transaction tx, BitcoinAddress to, TxOut opReturnOutput)
+        {
+            tx.Outputs.Add(opReturnOutput);
+
+            var referenceOutput = tx.Outputs.Where(o => o.ScriptPubKey.GetDestinationAddress(NetworkOperator.Instance.Network) == to)
+                                            .OrderBy(o => o.Value)
+                                            .First();
+            
+            tx.Outputs.Remove(referenceOutput);
+
+            tx.Outputs.Add(referenceOutput);
+            
+        }
 
         private async Task<Transaction> BuildUnsignedTx(TransactionBuilder builder, string fromAddress, string toAddress, string feeAddress, 
                                                        Money btcAmount, Money usdtAmount, FeeRate feeRate, Coin fromCoin, List<Coin> feeCoins)

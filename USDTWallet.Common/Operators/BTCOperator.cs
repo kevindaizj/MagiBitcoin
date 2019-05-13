@@ -179,6 +179,7 @@ namespace USDTWallet.Common.Operators
         {
             var joint = new UnsignedTxJoint
             {
+                OperationId = txInfo.OperationId,
                 TransactionHex = txInfo.Transaction.ToHex(),
                 ToSpentCoins = txInfo.ToSpentCoins
             };
@@ -197,6 +198,7 @@ namespace USDTWallet.Common.Operators
 
             return new UnsignTransactionResult
             {
+                OperationId = joint.OperationId,
                 Transaction = tx,
                 ToSpentCoins = joint.ToSpentCoins
             };

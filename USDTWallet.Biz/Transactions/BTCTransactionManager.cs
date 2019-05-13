@@ -76,11 +76,12 @@ namespace USDTWallet.Biz.Transactions
                 IsSigned = false,
                 CreateDate = DateTime.Now
             };
-
+            
             TransactionDao.Create(txInfo);
 
             var result = new UnsignTransactionResult
             {
+                OperationId = txInfo.Id,
                 Transaction = tx,
                 ToSpentCoins = coins
             };

@@ -49,6 +49,7 @@ namespace USDTWallet.Common.Operators
         {
             this.Init(networkType, rpcUrl, rpcUserName, rpcPassword);
             BTCOperator.Instance.ChangeNetwork(Credential, RpcUri, Network);
+            USDTOperator.Instance.ChangeNetwork(Credential, RpcUri, Network);
         }
 
         public async Task<bool> CheckNetwork()

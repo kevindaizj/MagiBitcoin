@@ -9,6 +9,7 @@ namespace USDTWallet.Models.Models.Transactions
 {
     public class UnsignedTxJoint
     {
+        public string OperationId { get; set; }
         public string TransactionHex { get; set; }
         public List<Coin> ToSpentCoins { get; set; }
     }

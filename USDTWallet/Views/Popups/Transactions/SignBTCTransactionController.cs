@@ -56,6 +56,8 @@ namespace USDTWallet.Views.Popups.Transactions
             set { this.SetProperty(ref _password, value); }
         }
 
+        private string OperationId { get; set; }
+
         private Transaction Transaction { get; set; }
 
         private List<Coin> SpentCoins { get; set; }
@@ -89,6 +91,7 @@ namespace USDTWallet.Views.Popups.Transactions
 
         private void InitData(UnsignTransactionResult txInfo)
         {
+            this.OperationId = txInfo.OperationId;
             this.Transaction = txInfo.Transaction;
             this.SpentCoins = txInfo.ToSpentCoins;
             this.TxJson = this.Transaction.ToString();
@@ -103,12 +106,12 @@ namespace USDTWallet.Views.Popups.Transactions
             if(PwdMethod)
             {
                 var pwd = SecureStringHelper.SecureStringToString(Password);
-                await TxManager.SignAndSendBTCTransaction(pwd, this.Transaction.ToHex(), this.SpentCoins);
+                await TxManager.SignAndSendBTCTransaction(pwd, this.Transaction.ToHex(), this.SpentCoins, this.OperationId);
             }
             else
             {
                 var keys = new List<string> { PrivKey };
-                await TxManager.SignAndSendTransactionByPrivateKey(keys, this.Transaction.ToHex(), this.SpentCoins);
+                await TxManager.SignAndSendTransactionByPrivateKey(keys, this.Transaction.ToHex(), this.SpentCoins, this.OperationId);
             }
 
             this.EventAggregator.GetEvent<TransactionCreated>().Publish();
