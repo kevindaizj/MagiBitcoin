@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace USDTWallet.Models.Models.Transactions
 {
-    public class OmniFeatureOutputs
+    public class OmniFeaturedOutputs
     {
         public TxOut OpReturnOutput { get; set; }
         public TxOut ReferenceOutput { get; set; }
