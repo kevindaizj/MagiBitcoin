@@ -12,28 +12,23 @@ namespace USDTWallet.Common.CoinSelectors
     {
         private OutPoint FromOutpoint { get; set; }
 
-        private Money DustAmount { get; set; }
-
-        public USDTCoinSelector(OutPoint fromOutpoint, Money dustAmount)
+        public USDTCoinSelector(OutPoint fromOutpoint)
         {
             this.FromOutpoint = fromOutpoint;
-            this.DustAmount = dustAmount;
         }
 
         public IEnumerable<ICoin> Select(IEnumerable<ICoin> coins, IMoney target)
         {
-            var defaultSelector = new DefaultCoinSelector();
+            var selector = new DefaultCoinSelector();
+            var selectedCoins = selector.Select(coins, target).ToList();
 
-            var fromCoin = coins.FirstOrDefault(o => o.Outpoint == this.FromOutpoint);
-
-            if (null != fromCoin &&
-                fromCoin.Amount.CompareTo(target) >= 0 &&
-                DustAmount.CompareTo(target) == 0)
+            if (!selectedCoins.Any(o => o.Outpoint == FromOutpoint))
             {
-                return coins;
+                var fromCoin = coins.Single(o => o.Outpoint == this.FromOutpoint);
+                selectedCoins.Insert(0, fromCoin);
             }
-            
-            return new DefaultCoinSelector().Select(coins, target);
+
+            return selectedCoins;
         }
     }
 }

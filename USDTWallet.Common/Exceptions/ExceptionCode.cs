@@ -11,6 +11,7 @@ namespace USDTWallet.Common.Exceptions
         InvalidAddress,
         WrongWalletPassword,
         AddressNotExisted,
-        insufficientBTC
+        InsufficientBTC,
+        InsufficientBTCForMinerFee
     }
 }
