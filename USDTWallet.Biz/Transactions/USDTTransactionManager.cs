@@ -24,14 +24,14 @@ namespace USDTWallet.Biz.Transactions
             this.TransactionDao = txDao;
         }
         
-        public async Task<UnsignTransactionResult> BuildUnsignedTransaction(USDTTransferVM transferInfo)
+        public async Task<UnsignTransactionResult> CreateTransaction(USDTTransferVM transferInfo)
         {
             var network = NetworkOperator.Instance.Network;
             var fromAddress = BitcoinAddress.Create(transferInfo.FromAddress, network);
             var toAddress = BitcoinAddress.Create(transferInfo.ToAddress, network);
             var feeAddress = BitcoinAddress.Create(transferInfo.FeeAddress, network);
             
-            var buildInfo = await this.Build(fromAddress, toAddress, feeAddress, transferInfo.Amount, transferInfo.EstimateFeeRate);
+            var buildInfo = await this.BuildUnsignedOmniTransaction(fromAddress, toAddress, feeAddress, transferInfo.Amount, transferInfo.EstimateFeeRate);
 
             var txInfo = new BaseTransactionInfo
             {
@@ -63,29 +63,41 @@ namespace USDTWallet.Biz.Transactions
 
         }
 
-        public async Task<OmniTransactionBuildResult> Build(BitcoinAddress fromAddress,
+        private async Task<OmniTransactionBuildResult> BuildUnsignedOmniTransaction(
+                                                            BitcoinAddress fromAddress,
                                                             BitcoinAddress toAddress,
                                                             BitcoinAddress feeAddress,
                                                             Money omniAmount,
                                                             FeeRate estimateFeeRate)
         {
-            if (fromAddress == toAddress)
-                throw new WTException(ExceptionCode.FromAddrCouldNotBeSameAsToAddr, "发送地址与接收地址不允许相同");
-
             var omniOutputs = await this.GetOmniFeaturedOutputs(toAddress, omniAmount);
             var opReturnOutput = omniOutputs.OpReturnOutput;
 
             var dustCostBTC = omniOutputs.ReferenceOutput.Value;
 
-            var fromAddressUnspentCoins = await BTCOperator.Instance.ListUnspentAsync(fromAddress.ToString());
-            var fromCoin = fromAddressUnspentCoins.Where(o => o.Amount >= dustCostBTC)
-                                                       .OrderByDescending(o => o.Amount)
-                                                       .Select(o => o.AsCoin())
-                                                       .FirstOrDefault();
+            var fromUnspentCoins = await BTCOperator.Instance.ListUnspentAsync(fromAddress.ToString());
+            
+            var feeUnspentCoins = await BTCOperator.Instance.ListUnspentAsync(feeAddress.ToString());
+
+            var result = this.Build(fromAddress, toAddress, feeAddress, fromUnspentCoins, feeUnspentCoins, dustCostBTC, estimateFeeRate, opReturnOutput);
+            return result;
+        }
+
+
+        private OmniTransactionBuildResult Build(BitcoinAddress fromAddress, BitcoinAddress toAddress, BitcoinAddress feeAddress,
+                                                 List<UnspentCoin> fromUnspentCoin, List<UnspentCoin> feeUnspentCoins,
+                                                 Money dustCostBTC, FeeRate estimateFeeRate, TxOut opReturnOutput)
+        {
+            if (fromAddress == toAddress)
+                throw new WTException(ExceptionCode.FromAddrCouldNotBeSameAsToAddr, "发送地址与接收地址不允许相同");
+
+            var fromCoin = fromUnspentCoin.Where(o => o.Amount >= dustCostBTC)
+                                          .OrderByDescending(o => o.Amount)
+                                          .Select(o => o.AsCoin())
+                                          .FirstOrDefault();
             if (null == fromCoin)
                 throw new WTException(ExceptionCode.InsufficientBTC, "发送地址没有足够的BTC：至少需要：" + dustCostBTC.ToString());
 
-            var feeUnspentCoins = await BTCOperator.Instance.ListUnspentAsync(feeAddress.ToString());
 
             var feeInfo = this.CalculateFinalFee(toAddress, feeAddress, fromCoin, feeUnspentCoins, dustCostBTC, estimateFeeRate, opReturnOutput);
 
@@ -102,12 +114,11 @@ namespace USDTWallet.Biz.Transactions
 
             var outputAmount = tx.Outputs.Select(o => o.Value).Sum();
             var newTxDetail = tx.ToString();
-            var size = builder.EstimateSize(tx);
 
             return new OmniTransactionBuildResult
             {
                 Transaction = tx,
-                TransactionSize = size,
+                TransactionSize = feeInfo.TransactionSize,
                 InputCoins = feeInfo.InputCoins.ToList()
             };
         }
@@ -216,9 +227,7 @@ namespace USDTWallet.Biz.Transactions
             tx.Outputs.Add(referenceOutput);
 
         }
-
-
-
+        
 
     }
 }

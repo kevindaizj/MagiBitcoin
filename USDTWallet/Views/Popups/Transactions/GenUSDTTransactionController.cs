@@ -68,7 +68,7 @@ namespace USDTWallet.Views.Popups.Transactions
 
         private async void GenTx()
         {
-            var result = await TxManager.BuildUnsignedTransaction(this.TransferInfo);
+            var result = await TxManager.CreateTransaction(this.TransferInfo);
             this.TxJson = result.Transaction.ToString();
             this.TxHex = BTCOperator.Instance.SerailizeUnsignedTxResult(result); 
         }

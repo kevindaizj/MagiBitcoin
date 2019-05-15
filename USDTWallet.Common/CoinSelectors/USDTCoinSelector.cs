@@ -25,7 +25,13 @@ namespace USDTWallet.Common.CoinSelectors
             if (!selectedCoins.Any(o => o.Outpoint == FromOutpoint))
             {
                 var fromCoin = coins.Single(o => o.Outpoint == this.FromOutpoint);
-                selectedCoins.Insert(0, fromCoin);
+                var fromCoinAmount = fromCoin.Amount as Money;
+                var selectedAmount = selectedCoins.Select(o => o.Amount).Cast<Money>().Sum();
+
+                if (fromCoinAmount >= selectedAmount)
+                    selectedCoins = new List<ICoin> { fromCoin };
+                else
+                    selectedCoins.Insert(0, fromCoin);
             }
 
             return selectedCoins;
