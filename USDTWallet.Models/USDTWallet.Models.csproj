@@ -94,6 +94,7 @@
     <Compile Include="Models\FeeRates\FeeRateResult.cs" />
     <Compile Include="Models\Mnemonics\MnemonicResult.cs" />
     <Compile Include="Models\Transactions\BaseTransactionInfo.cs" />
+    <Compile Include="Models\Transactions\BTCTransactionBuildResult.cs" />
     <Compile Include="Models\Transactions\CalculatedOmniFeeInfo.cs" />
     <Compile Include="Models\Transactions\CustomRawTransactionInfo.cs" />
     <Compile Include="Models\Transactions\MempoolTxItem.cs" />

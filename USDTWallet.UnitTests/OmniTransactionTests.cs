@@ -108,14 +108,7 @@ namespace USDTWallet.UnitTests
 
             Assert.ThrowsException<WTException>(() =>
             {
-                try
-                {
-                    this.InvokeBuild(null, null, null, null, null, address, address, null);
-                }
-                catch (Exception ex)
-                {
-                    throw ex.InnerException;
-                }
+                this.InvokeBuild(null, null, null, null, null, address, address, null);
             });
             
         }
@@ -177,7 +170,7 @@ namespace USDTWallet.UnitTests
 
 
         ///// <summary>
-        ///// 未签名的预计size与签名后的size一致
+        ///// 未签名的预计size与签名后的size一致(有找零的情况下)
         ///// </summary>
         [TestMethod]
         public void EstimatedUnsignedSizeIsSameAsSignedSize()
@@ -204,7 +197,7 @@ namespace USDTWallet.UnitTests
             var tx = result.Transaction;
             tx.Sign(keys, result.InputCoins.ToArray());
 
-            var esitmatedSize = result.TransactionSize;
+            var esitmatedSize = result.EstimatedSize;
             var actualSize = tx.GetSerializedSize();
             var diff = esitmatedSize - actualSize;
 
@@ -212,7 +205,7 @@ namespace USDTWallet.UnitTests
         }
 
         ///// <summary>
-        ///// 未签名的预计size与签名后的size一致
+        ///// 未签名的预计size与签名后的size不一致（刚好用完Coin，没有找零）
         ///// </summary>
         [TestMethod]
         public void EstimatedUnsignedSizeIsSameAsSignedSize2()
@@ -241,23 +234,109 @@ namespace USDTWallet.UnitTests
 
             var result = this.InvokeBuild(fromUnspentCoin, feeUnspentCoins, dust, feeRate);
             var tx = result.Transaction;
-
             
-
             tx.Sign(keys, result.InputCoins.ToArray());
 
-            var esitmatedSize = result.TransactionSize;
+            var esitmatedSize = result.SizeFromFee;
             var actualSize = tx.GetSerializedSize();
-            var diff = esitmatedSize - actualSize;
-
-            var inputs = tx.Inputs.Select(o => o.GetSerializedSize()).Sum();
-            var outputs = tx.Outputs.Select(o => o.GetSerializedSize()).Sum();
-            var sum = inputs + outputs;
-
-            var estimatedTxSize = 3 * 148 + 1 * 34 + 31 + 10 + 3;
-
-            Assert.IsTrue(diff >= 0 && diff <= result.InputCoins.Count);
+            var delta = esitmatedSize - actualSize;
+            
+            Assert.IsTrue(delta == 34 + tx.Inputs.Count);
         }
+
+
+        /// <summary>
+        /// 有找零时预计手续费与最终手续费一致
+        /// </summary>
+        [TestMethod]
+        public void EstimatedFeeWithChangeOutput()
+        {
+            var tool = new Tool();
+
+            var dust = Money.Parse(this.DustCostBTC.ToString());
+            var feeAmount = Money.Parse("100");
+            var totalAmount = dust + feeAmount;
+
+            var fromUnspentCoin = new List<UnspentCoin>
+            {
+                tool.NewUnspentCoin(FromAddress, dust)
+            };
+            var fromCoin = fromUnspentCoin.Single().AsCoin();
+
+            var feeUnspentCoins = new List<UnspentCoin>
+            {
+                tool.NewUnspentCoin(FeeAddress, feeAmount)
+            };
+
+            // 包含找零output的tx总大小
+            var size = 405;
+            // 此费率刚好用完所有的Coin
+            var exactFeeRateAmount = new Money(feeAmount.Satoshi / size * 1000);
+
+            // 小于exactFeeRateAmount，则一定有找零output生成
+            var feeRateAmount = exactFeeRateAmount / 100;
+            var feeRate = new FeeRate(feeRateAmount);
+
+            var txInfo = this.InvokeBuild(fromUnspentCoin, feeUnspentCoins, estimateFeeRate: feeRate);
+            var feeInfo = this.InvokeEstimateFinalFee(fromCoin, feeUnspentCoins, estimateFeeRate: feeRate);
+
+            var tx = txInfo.Transaction;
+            var outputAmount = tx.Outputs.Select(o => o.Value).Sum();
+            var actualUsedFee = totalAmount - outputAmount;
+
+            var currentTxFee = feeRate.GetFee(txInfo.EstimatedSize);
+            
+            Assert.IsTrue(feeInfo.Fee == actualUsedFee && actualUsedFee == currentTxFee);
+        }
+
+
+        /// <summary>
+        /// 无找零时预计手续费与最终手续费一致
+        /// </summary>
+        [TestMethod]
+        public void EstimatedFeeWithoutChangeOutput()
+        {
+            var tool = new Tool();
+
+            var dust = Money.Parse(this.DustCostBTC.ToString());
+            var feeAmount = Money.Parse("100");
+            var totalAmount = dust + feeAmount;
+
+            var fromUnspentCoin = new List<UnspentCoin>
+            {
+                tool.NewUnspentCoin(FromAddress, dust)
+            };
+            var fromCoin = fromUnspentCoin.Single().AsCoin();
+
+            var feeUnspentCoins = new List<UnspentCoin>
+            {
+                tool.NewUnspentCoin(FeeAddress, feeAmount)
+            };
+
+            // 包含找零output的tx总大小
+            var size = 405;
+            var exactFeeRateAmount = new Money(feeAmount.Satoshi / size * 1000);
+            // 此费率刚好用完所有的Coin (意味着不会产生找零output)
+            var feeRate = new FeeRate(exactFeeRateAmount);
+
+            var txInfo = this.InvokeBuild(fromUnspentCoin, feeUnspentCoins, estimateFeeRate: feeRate);
+            var feeInfo = this.InvokeEstimateFinalFee(fromCoin, feeUnspentCoins, estimateFeeRate: feeRate);
+
+            var tx = txInfo.Transaction;
+            var outputAmount = tx.Outputs.Select(o => o.Value).Sum();
+            
+            var changeOutputFee = feeRate.GetFee(34);
+
+            var actualUsedFee = totalAmount - outputAmount;
+            var currentTxFee = feeRate.GetFee(txInfo.EstimatedSize);
+            var delta = actualUsedFee - currentTxFee;
+            var delta2 = feeInfo.Fee - currentTxFee;
+
+            Assert.AreEqual(delta2, changeOutputFee);
+            Assert.IsTrue(delta - changeOutputFee < dust);
+        }
+
+
 
         /// <summary>
         /// 检查BTC找零金额计算是否正确
@@ -361,13 +440,31 @@ namespace USDTWallet.UnitTests
             fromAddress = fromAddress ?? this.FromAddress;
             toAddress = toAddress ?? this.ToAddress;
             feeAddress = feeAddress ?? this.FeeAddress;
-
-            var manager = new PrivateObject(TxManager);
-            var result = manager.Invoke("Build", fromAddress, toAddress, feeAddress, fromUnspentCoin, feeUnspentCoins, dustCostBTC, estimateFeeRate, opReturnOutput);
-            return result as OmniTransactionBuildResult;
+            
+            var result = TxManager.Build(fromAddress, toAddress, feeAddress, fromUnspentCoin, feeUnspentCoins, dustCostBTC, estimateFeeRate, opReturnOutput);
+            return result;
         }
 
 
-            
+        private CalculatedOmniFeeInfo InvokeEstimateFinalFee(
+                                                 Coin fromCoin,
+                                                 List<UnspentCoin> feeUnspentCoins,
+                                                 Money dustCostBTC = null,
+                                                 FeeRate estimateFeeRate = null,
+                                                 TxOut opReturnOutput = null,
+                                                 BitcoinAddress toAddress = null,
+                                                 BitcoinAddress feeAddress = null)
+        {
+            dustCostBTC = dustCostBTC ?? this.DustCostBTC;
+            estimateFeeRate = estimateFeeRate ?? this.EstimateFeeRate;
+            opReturnOutput = opReturnOutput ?? this.OpReturnOutput;
+            toAddress = toAddress ?? this.ToAddress;
+            feeAddress = feeAddress ?? this.FeeAddress;
+
+            var result = TxManager.EstimateFinalFee(toAddress, feeAddress, fromCoin, feeUnspentCoins, dustCostBTC, estimateFeeRate, opReturnOutput);
+            return result;
+        }
+
+
     }
 }

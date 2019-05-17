@@ -43,7 +43,7 @@ namespace USDTWallet.Biz.Transactions
                 ChangeAddress = transferInfo.FeeAddress,
                 FeeAddress = transferInfo.FeeAddress,
                 FeeRate = transferInfo.EstimateFeeRate.SatoshiPerByte,
-                EstimateSize = buildInfo.TransactionSize,
+                EstimateSize = buildInfo.EstimatedSize,
                 Amount = transferInfo.Amount.ToDecimal(MoneyUnit.BTC),
                 IsSigned = false,
                 CreateDate = DateTime.Now
@@ -84,7 +84,7 @@ namespace USDTWallet.Biz.Transactions
         }
 
 
-        private OmniTransactionBuildResult Build(BitcoinAddress fromAddress, BitcoinAddress toAddress, BitcoinAddress feeAddress,
+        public OmniTransactionBuildResult Build(BitcoinAddress fromAddress, BitcoinAddress toAddress, BitcoinAddress feeAddress,
                                                  List<UnspentCoin> fromUnspentCoin, List<UnspentCoin> feeUnspentCoins,
                                                  Money dustCostBTC, FeeRate estimateFeeRate, TxOut opReturnOutput)
         {
@@ -99,7 +99,7 @@ namespace USDTWallet.Biz.Transactions
                 throw new WTException(ExceptionCode.InsufficientBTC, "发送地址没有足够的BTC：至少需要：" + dustCostBTC.ToString());
 
 
-            var feeInfo = this.CalculateFinalFee(toAddress, feeAddress, fromCoin, feeUnspentCoins, dustCostBTC, estimateFeeRate, opReturnOutput);
+            var feeInfo = this.EstimateFinalFee(toAddress, feeAddress, fromCoin, feeUnspentCoins, dustCostBTC, estimateFeeRate, opReturnOutput);
 
             var builder = NetworkOperator.Instance.Network.CreateTransactionBuilder();
             var tx = builder.AddCoins(feeInfo.InputCoins)
@@ -110,15 +110,12 @@ namespace USDTWallet.Biz.Transactions
                             .BuildTransaction(false);
 
             this.ReorganizeOutput(tx, toAddress, opReturnOutput);
-
-
-            var outputAmount = tx.Outputs.Select(o => o.Value).Sum();
-            var newTxDetail = tx.ToString();
-
+            
             return new OmniTransactionBuildResult
             {
                 Transaction = tx,
-                TransactionSize = feeInfo.TransactionSize,
+                EstimatedSize = builder.EstimateSize(tx),
+                SizeFromFee = feeInfo.TransactionSize,
                 InputCoins = feeInfo.InputCoins.ToList()
             };
         }
@@ -161,7 +158,7 @@ namespace USDTWallet.Biz.Transactions
         }
         
 
-        private CalculatedOmniFeeInfo CalculateFinalFee(BitcoinAddress toAddress, BitcoinAddress feeAddress,
+        public CalculatedOmniFeeInfo EstimateFinalFee(BitcoinAddress toAddress, BitcoinAddress feeAddress,
                                       Coin fromCoin, List<UnspentCoin> feeUnspentCoins,
                                       Money dustCostBTC, FeeRate estimateFeeRate, TxOut opReturnOutput)
         {
@@ -174,6 +171,7 @@ namespace USDTWallet.Biz.Transactions
             List<Coin> inputCoins = null;
             int size = 0;
             Money minerFee = Money.Zero;
+            Money previousMinerFee = Money.Zero;
 
             do
             {
@@ -190,6 +188,8 @@ namespace USDTWallet.Biz.Transactions
                                 .BuildTransaction(false);
 
                 tx.Outputs.Add(opReturnOutput);
+
+                previousMinerFee = minerFee;
 
                 size = builder.EstimateSize(tx);
                 var feeAmount = size * estimateFeeRate.SatoshiPerByte;

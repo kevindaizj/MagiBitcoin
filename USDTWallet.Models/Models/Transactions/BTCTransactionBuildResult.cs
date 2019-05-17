@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace USDTWallet.Models.Models.Transactions
 {
-    public class OmniTransactionBuildResult
+    public class BTCTransactionBuildResult
     {
         public Transaction Transaction { get; set; }
-        public int EstimatedSize { get; set; }
+        public int TransactionSize { get; set; }
+        public Money Fee { get; set; }
         public List<Coin> InputCoins { get; set; }
-        public int SizeFromFee { get; set; }
     }
 }
